@@ -1,6 +1,6 @@
 # CINEMA — Streaming Platform
 
-A full-stack Netflix-style streaming platform built with Next.js 15, Supabase, and Tailwind CSS.
+A full-stack Netflix-style streaming platform built with **Next.js 15**, Supabase, and Tailwind CSS.
 
 ## Features
 
