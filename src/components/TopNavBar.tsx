@@ -1,21 +1,19 @@
-import Link   from 'next/link'
+import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { signOut }                    from '@/lib/actions/auth'
-import NavSearch                      from './NavSearch'
+import { signOut } from '@/lib/actions/auth'
+import NavSearch from './NavSearch'
+import { NavLinks } from './NavLinks'
 
-const NAV_LINKS = [
-  { href: '/',        label: 'Home'    },
-  { href: '/browse',  label: 'Browse'  },
-  { href: '/library', label: 'My List' },
-]
+interface Props {
+  activePath?: string
+}
 
-interface Props { activePath?: string }
-
-export default async function TopNavBar({ activePath }: Props) {
+export default async function TopNavBar({ activePath: _activePath }: Props) {
   const supabase = await createSupabaseServerClient()
+
   const {
-  data: { user },
-} = await supabase.auth.getUser()
+    data: { user },
+  } = await supabase.auth.getUser()
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-cinema-bg/60 backdrop-blur-xl border-b border-white/[0.06]">
@@ -32,29 +30,8 @@ export default async function TopNavBar({ activePath }: Props) {
           CINEMA
         </Link>
 
-        {/* Nav links — hidden on mobile */}
-        <ul className="hidden md:flex items-center gap-8 list-none m-0 p-0">
-          {NAV_LINKS.map(({ href, label }) => {
-            const isActive = activePath === href
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={[
-                    'text-sm font-medium transition-colors duration-200 pb-0.5',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded',
-                    isActive
-                      ? 'text-white border-b-2 border-cinema-accent'
-                      : 'text-white/60 hover:text-white',
-                  ].join(' ')}
-                >
-                  {label}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+        {/* Animated nav links — hidden on mobile */}
+        <NavLinks />
 
         {/* Right side */}
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
@@ -72,6 +49,7 @@ export default async function TopNavBar({ activePath }: Props) {
               >
                 ◈ Watch Party
               </Link>
+
               <Link
                 href="/settings"
                 aria-label="Account settings"
@@ -82,6 +60,7 @@ export default async function TopNavBar({ activePath }: Props) {
               >
                 {user.email?.[0]?.toUpperCase() ?? 'U'}
               </Link>
+
               <form action={signOut}>
                 <button
                   type="submit"

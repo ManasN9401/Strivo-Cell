@@ -1,7 +1,6 @@
-import { Suspense }   from 'react'
-import TopNavBar      from '@/components/TopNavBar'
-import ContentRow     from '@/components/ContentRow'
-import Footer         from '@/components/Footer'
+import { Suspense } from 'react'
+import ContentRow from '@/components/ContentRow'
+import Footer from '@/components/Footer'
 import { getAllGenres, getTitlesByGenre, getWatchlistIds } from '@/lib/supabase/queries'
 
 export const metadata = { title: 'Browse' }
@@ -14,10 +13,10 @@ interface Props {
 
 async function BrowseContent({ genre }: { genre?: string }) {
   const allGenres = await getAllGenres()
-  const targets   = genre ? [genre] : allGenres
+  const targets = genre ? [genre] : allGenres
 
   const [rows, watchlistIds] = await Promise.all([
-    Promise.all(targets.map(g => getTitlesByGenre(g).then(t => ({ genre: g, titles: t })))),
+    Promise.all(targets.map((g) => getTitlesByGenre(g).then((titles) => ({ genre: g, titles })))),
     getWatchlistIds(),
   ])
 
@@ -25,22 +24,16 @@ async function BrowseContent({ genre }: { genre?: string }) {
     <>
       {rows.map(({ genre: g, titles }) =>
         titles.length ? (
-          <ContentRow key={g} heading={g} titles={titles} watchlistIds={watchlistIds}
-                      browseHref={`/browse?genre=${g}`}/>
+          <ContentRow
+            key={g}
+            heading={g}
+            titles={titles}
+            watchlistIds={watchlistIds}
+            browseHref={`/browse?genre=${encodeURIComponent(g)}`}
+          />
         ) : null
       )}
     </>
-  )
-}
-
-function GenreFilterSkeleton() {
-  return (
-    <div className="flex gap-2 flex-wrap mb-8">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-8 w-20 bg-cinema-surface rounded-full animate-pulse"
-             style={{ animationDelay: `${i * 40}ms` }}/>
-      ))}
-    </div>
   )
 }
 
@@ -49,7 +42,6 @@ export default async function BrowsePage({ searchParams }: Props) {
 
   return (
     <>
-      <TopNavBar activePath="/browse" />
       <main className="bg-cinema-bg min-h-screen pt-20">
         <div className="max-w-content mx-auto px-8 py-8">
           <h1 className="text-4xl font-black tracking-tight mb-2">Browse</h1>

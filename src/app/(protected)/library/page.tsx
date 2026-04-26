@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-import TopNavBar    from '@/components/TopNavBar'
 import MovieCard    from '@/components/MovieCard'
 import Footer       from '@/components/Footer'
 import { getWatchlist } from '@/lib/supabase/queries'
@@ -40,7 +39,6 @@ async function LibraryGrid() {
 export default function LibraryPage() {
   return (
     <>
-      <TopNavBar activePath="/library"/>
       <main className="bg-cinema-bg min-h-screen pt-20">
         <div className="max-w-content mx-auto px-8 py-8">
           <h1 className="text-4xl font-black tracking-tight mb-1">My List</h1>

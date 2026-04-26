@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { signIn } from '@/lib/actions/auth'
+import SubmitButton from '@/components/SubmitButton'
 
 interface Props {
   searchParams: Promise<{
@@ -78,16 +79,17 @@ export default async function LoginPage({ searchParams }: Props) {
               />
             </div>
 
-            <button
-              type="submit"
+            <SubmitButton
+              pendingLabel="Signing in…"
               className="w-full bg-cinema-accent hover:bg-cinema-accent-hover text-white
                          font-semibold rounded-lg py-3 text-sm transition-colors duration-200
-                         cursor-pointer focus-visible:outline-none focus-visible:ring-2
+                         cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed
+                         focus-visible:outline-none focus-visible:ring-2
                          focus-visible:ring-cinema-accent focus-visible:ring-offset-2
                          focus-visible:ring-offset-cinema-surface"
             >
               Sign in
-            </button>
+            </SubmitButton>
           </form>
 
           <p className="mt-6 text-center text-sm text-white/40">

@@ -1,5 +1,4 @@
 import { Suspense }          from 'react'
-import TopNavBar             from '@/components/TopNavBar'
 import HeroBanner            from '@/components/HeroBanner'
 import ContentRow            from '@/components/ContentRow'
 import ContinueWatchingRow   from '@/components/ContinueWatchingRow'
@@ -62,7 +61,6 @@ async function HomeRows() {
 export default function HomePage() {
   return (
     <>
-      <TopNavBar activePath="/"/>
       <main className="bg-cinema-bg min-h-screen">
         <Suspense fallback={<div className="h-[88vh] bg-cinema-surface/20 animate-pulse"/>}>
           <HeroBanner/>

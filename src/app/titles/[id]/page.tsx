@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import TopNavBar from '@/components/TopNavBar'
 import ContentRow from '@/components/ContentRow'
 import Footer from '@/components/Footer'
 import { getTitle, getRelatedTitles, getWatchlistIds } from '@/lib/supabase/queries'
@@ -17,7 +16,6 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params
-
   const title = await getTitle(id)
 
   if (!title) return {}
@@ -39,21 +37,14 @@ export default async function TitleDetailPage({ params }: Props) {
   if (!title) notFound()
 
   const primaryGenre = title.genre?.[0]
-
-  const related = primaryGenre
-    ? await getRelatedTitles(id, primaryGenre)
-    : []
-
+  const related = primaryGenre ? await getRelatedTitles(id, primaryGenre) : []
   const inWatchlist = watchlistIds.has(title.id)
-
   const duration = title.duration_mins
     ? `${Math.floor(title.duration_mins / 60)}h ${title.duration_mins % 60}m`
     : null
 
   return (
     <>
-      <TopNavBar />
-
       <main className="bg-cinema-bg min-h-screen">
         <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
           {title.backdrop_path && (
@@ -72,7 +63,10 @@ export default async function TitleDetailPage({ params }: Props) {
 
         <div className="max-w-content mx-auto px-8 -mt-48 relative z-10 pb-20">
           <div className="flex flex-col md:flex-row gap-10">
-            <div className="relative w-40 sm:w-52 flex-shrink-0 aspect-[2/3] rounded-xl overflow-hidden bg-cinema-surface shadow-2xl self-start">
+            <div
+              className="relative w-40 sm:w-52 flex-shrink-0 aspect-[2/3] rounded-xl
+                         overflow-hidden bg-cinema-surface shadow-2xl self-start"
+            >
               {title.poster_path && (
                 <Image
                   src={title.poster_path}
@@ -90,7 +84,7 @@ export default async function TitleDetailPage({ params }: Props) {
                 {(title.genre ?? []).map((g) => (
                   <Link
                     key={g}
-                    href={`/browse?genre=${g}`}
+                    href={`/browse?genre=${encodeURIComponent(g)}`}
                     className="text-[11px] font-bold uppercase tracking-widest
                                text-cinema-accent border border-cinema-accent/40
                                px-2.5 py-1 rounded-full hover:bg-cinema-accent/10
@@ -100,7 +94,6 @@ export default async function TitleDetailPage({ params }: Props) {
                     {g}
                   </Link>
                 ))}
-
                 {(title.tags ?? []).map((tag) => (
                   <span
                     key={tag}
@@ -185,17 +178,12 @@ export default async function TitleDetailPage({ params }: Props) {
           {related.length > 0 && (
             <div className="mt-16">
               <Suspense fallback={null}>
-                <ContentRow
-                  heading="More like this"
-                  titles={related}
-                  watchlistIds={watchlistIds}
-                />
+                <ContentRow heading="More like this" titles={related} watchlistIds={watchlistIds} />
               </Suspense>
             </div>
           )}
         </div>
       </main>
-
       <Footer />
     </>
   )
