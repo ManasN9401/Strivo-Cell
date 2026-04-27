@@ -31,18 +31,13 @@ next-env.d.ts
 # OS/editor
 .DS_Store
 Thumbs.db
-.vscode/*
-!.vscode/settings.json
 .idea/
 
-# generated video/HLS output
-output/
-hls-output/
-hls-movie/
-*.ts
-*.m3u8
+# VS Code
+.vscode/*
+!.vscode/settings.json
 
-# temporary files
+# temporary/cache files
 tmp/
 temp/
 .cache/
@@ -50,3 +45,29 @@ temp/
 # Supabase local temp
 supabase/.branches/
 supabase/.temp/
+
+# generated video/HLS output folders
+output/
+hls-output/
+hls-movie/
+video-output/
+media-output/
+
+# generated HLS/video files only inside local output folders
+output/**/*.ts
+output/**/*.m3u8
+hls-output/**/*.ts
+hls-output/**/*.m3u8
+hls-movie/**/*.ts
+hls-movie/**/*.m3u8
+video-output/**/*.ts
+video-output/**/*.m3u8
+media-output/**/*.ts
+media-output/**/*.m3u8
+
+# local video source/exports
+*.mp4
+*.mkv
+*.mov
+*.avi
+*.webm

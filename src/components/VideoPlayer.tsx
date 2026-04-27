@@ -5,6 +5,7 @@ import { saveProgress } from '@/lib/actions/progress'
 import { createBrowserClient } from '@supabase/ssr'
 
 type HlsType = typeof import('hls.js').default
+type PlaybackEngine = 'hlsjs' | 'native' | 'unsupported' | null
 
 let HlsLib: HlsType | null = null
 
@@ -41,7 +42,7 @@ export default function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<InstanceType<HlsType> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const playlistUrlRef = useRef<string | null>(null)
+  const settingsRef = useRef<HTMLDivElement>(null)
 
   const currentTimeRef = useRef(initialProgressSecs)
   const durationRef = useRef(0)
@@ -59,9 +60,23 @@ export default function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true)
   const [srcError, setSrcError] = useState<string | null>(null)
 
+  const [playbackEngine, setPlaybackEngine] = useState<PlaybackEngine>(null)
+
+  const [qualityLevels, setQualityLevels] = useState<
+    { index: number; label: string }[]
+  >([])
+  const [selectedLevel, setSelectedLevel] = useState(-1)
+
+  const [showSettings, setShowSettings] = useState(false)
+  const [playbackRate, setPlaybackRate] = useState(1)
+
+  const [subtitleTracks, setSubtitleTracks] = useState<
+    { label: string; lang: string; index: number }[]
+  >([])
+  const [selectedSubtitle, setSelectedSubtitle] = useState(-1)
+
   const [, startTransition] = useTransition()
 
-  // Load HLS
   useEffect(() => {
     let destroyed = false
 
@@ -72,6 +87,12 @@ export default function VideoPlayer({
         setProgress(0)
         setBuffered(0)
         setTimeDisplay('0:00 / 0:00')
+        setPlaybackEngine(null)
+        setQualityLevels([])
+        setSelectedLevel(-1)
+        setSubtitleTracks([])
+        setSelectedSubtitle(-1)
+        setShowSettings(false)
 
         const video = videoRef.current
         if (!video) return
@@ -89,46 +110,21 @@ export default function VideoPlayer({
           throw new Error('Not signed in')
         }
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-signed-url`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({
-              title_id: titleId,
-              quality: '720p',
-            }),
-          }
-        )
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\/+$/, '')
+        const functionUrl = `${supabaseUrl}/functions/v1/get-signed-url/`
+        const authHeader = `Bearer ${session.access_token}`
 
-        if (!res.ok) {
-          throw new Error('Could not get playback playlist')
-        }
-
-        const { playlist } = await res.json()
-
-        if (!playlist || typeof playlist !== 'string') {
-          throw new Error('Invalid playback playlist')
-        }
-
-        if (destroyed) return
-
-        const playlistUrl = URL.createObjectURL(
-          new Blob([playlist], {
-            type: 'application/vnd.apple.mpegurl',
-          })
-        )
-
-        playlistUrlRef.current = playlistUrl
+        const sourceUrl = `${functionUrl}?title_id=${encodeURIComponent(
+          titleId
+        )}&quality=720p`
 
         const seekToInitialProgress = () => {
           if (initialProgressSecs > 0) {
             video.currentTime = initialProgressSecs
             currentTimeRef.current = initialProgressSecs
           }
+
+          video.playbackRate = playbackRate
         }
 
         video.addEventListener('loadedmetadata', seekToInitialProgress, {
@@ -140,28 +136,65 @@ export default function VideoPlayer({
         if (destroyed) return
 
         if (Hls.isSupported()) {
+          setPlaybackEngine('hlsjs')
+
           const hls = new Hls({
             startLevel: -1,
             maxBufferLength: 30,
+            xhrSetup: (xhr, url) => {
+              if (url.includes('/functions/v1/get-signed-url')) {
+                xhr.setRequestHeader('Authorization', authHeader)
+              }
+            },
           })
 
           hlsRef.current = hls
-          hls.loadSource(playlistUrl)
+          hls.loadSource(sourceUrl)
           hls.attachMedia(video)
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            const levels = hls.levels.map((level, index) => ({
+              index,
+              label: level.height
+                ? `${level.height}p`
+                : `${Math.round(level.bitrate / 1000)}kbps`,
+            }))
+
+            const tracks = hls.subtitleTracks.map((track, index) => ({
+              index,
+              label: track.name || track.lang || `Track ${index + 1}`,
+              lang: track.lang || '',
+            }))
+
+            setQualityLevels(levels)
+            setSelectedLevel(-1)
+            setSubtitleTracks(tracks)
+            setSelectedSubtitle(-1)
             setIsLoading(false)
           })
 
+          hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
+            const tracks = hls.subtitleTracks.map((track, index) => ({
+              index,
+              label: track.name || track.lang || `Track ${index + 1}`,
+              lang: track.lang || '',
+            }))
+
+            setSubtitleTracks(tracks)
+          })
+
           hls.on(Hls.Events.ERROR, (_, data) => {
+            console.error('HLS error:', data)
+
             if (data.fatal) {
               setSrcError('Playback error.')
             }
           })
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = playlistUrl
-          setIsLoading(false)
+          setPlaybackEngine('native')
+          setSrcError('Native HLS playback is not supported for private adaptive streams.')
         } else {
+          setPlaybackEngine('unsupported')
           setSrcError('Browser does not support HLS playback.')
         }
       } catch (e: any) {
@@ -179,14 +212,14 @@ export default function VideoPlayer({
       hlsRef.current?.destroy()
       hlsRef.current = null
 
-      if (playlistUrlRef.current) {
-        URL.revokeObjectURL(playlistUrlRef.current)
-        playlistUrlRef.current = null
+      const video = videoRef.current
+      if (video) {
+        video.removeAttribute('src')
+        video.load()
       }
     }
   }, [titleId, initialProgressSecs])
 
-  // Video events
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
@@ -238,7 +271,6 @@ export default function VideoPlayer({
     }
   }, [])
 
-  // Progress save every 10s
   useEffect(() => {
     saveTimerRef.current = setInterval(() => {
       if (currentTimeRef.current > 5) {
@@ -255,7 +287,6 @@ export default function VideoPlayer({
     }
   }, [titleId, startTransition])
 
-  // Controls auto-hide
   const showControls = useCallback(() => {
     setControlsVisible(true)
 
@@ -265,6 +296,7 @@ export default function VideoPlayer({
 
     hideTimerRef.current = setTimeout(() => {
       setControlsVisible(false)
+      setShowSettings(false)
     }, 3000)
   }, [])
 
@@ -288,6 +320,34 @@ export default function VideoPlayer({
 
     return () => document.removeEventListener('fullscreenchange', onFs)
   }, [])
+
+  useEffect(() => {
+    function onDocumentMouseDown(e: MouseEvent) {
+      if (!showSettings) return
+
+      if (
+        settingsRef.current &&
+        e.target instanceof Node &&
+        !settingsRef.current.contains(e.target)
+      ) {
+        setShowSettings(false)
+      }
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setShowSettings(false)
+      }
+    }
+
+    document.addEventListener('mousedown', onDocumentMouseDown)
+    document.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', onDocumentMouseDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [showSettings])
 
   function togglePlay() {
     const v = videoRef.current
@@ -334,6 +394,42 @@ export default function VideoPlayer({
     setIsMuted(v.muted)
   }
 
+  function changeQuality(levelIndex: number) {
+    const hls = hlsRef.current
+    if (!hls) return
+
+    hls.currentLevel = levelIndex
+    setSelectedLevel(levelIndex)
+    showControls()
+  }
+
+  function changePlaybackRate(rate: number) {
+    const video = videoRef.current
+    if (!video) return
+
+    video.playbackRate = rate
+    setPlaybackRate(rate)
+    showControls()
+  }
+
+  function disableSubtitles() {
+    const hls = hlsRef.current
+    if (!hls) return
+
+    hls.subtitleTrack = -1
+    setSelectedSubtitle(-1)
+    showControls()
+  }
+
+  function changeSubtitleTrack(index: number) {
+    const hls = hlsRef.current
+    if (!hls) return
+
+    hls.subtitleTrack = index
+    setSelectedSubtitle(index)
+    showControls()
+  }
+
   function skip(s: number) {
     const v = videoRef.current
     if (!v) return
@@ -342,6 +438,8 @@ export default function VideoPlayer({
       0,
       Math.min(v.currentTime + s, durationRef.current || v.duration || 0)
     )
+
+    showControls()
   }
 
   async function toggleFs() {
@@ -353,6 +451,8 @@ export default function VideoPlayer({
     } else {
       await el.requestFullscreen()
     }
+
+    showControls()
   }
 
   if (srcError) {
@@ -519,22 +619,189 @@ export default function VideoPlayer({
               </span>
             </div>
 
-            <button
-              onClick={toggleFs}
-              aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-              className="text-white/70 hover:text-white transition-colors cursor-pointer
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
-            >
-              {isFullscreen ? (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                  <path d="M7 3H3v4M17 3h-4v4M7 17H3v-4M17 17h-4v-4" />
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                  <path d="M3 7V3h4M13 3h4v4M3 13v4h4M17 13v4h-4" />
-                </svg>
-              )}
-            </button>
+            <div className="flex items-center gap-1.5">
+              <div ref={settingsRef} className="relative flex items-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSettings((v) => !v)
+                    showControls()
+                  }}
+                  aria-label="Playback settings"
+                  className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white
+                            transition-colors cursor-pointer
+                            focus-visible:outline-none focus-visible:ring-2
+                            focus-visible:ring-cinema-accent rounded-full"
+                >
+                  <svg
+                    width="19"
+                    height="19"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M8.7 2.8h2.6l.5 1.8c.5.2.9.4 1.4.8l1.8-.5 1.3 2.2-1.3 1.3c.1.3.1.7.1 1s0 .7-.1 1l1.3 1.3-1.3 2.2-1.8-.5c-.4.3-.9.6-1.4.8l-.5 1.8H8.7l-.5-1.8a5.9 5.9 0 0 1-1.4-.8l-1.8.5-1.3-2.2L5 10.4a7 7 0 0 1 0-2L3.7 7.1 5 4.9l1.8.5c.4-.3.9-.6 1.4-.8l.5-1.8Z" />
+                    <circle cx="10" cy="10" r="2.3" />
+                  </svg>
+                </button>
+
+                {showSettings && (
+                  <div
+                    className="absolute bottom-11 right-0 w-60 rounded-xl border border-white/10
+                              bg-cinema-surface/95 backdrop-blur-xl shadow-xl p-3 space-y-4 z-30"
+                  >
+                    <div>
+                      <p className="text-xs font-semibold text-white/70 mb-2">Quality</p>
+
+                      {playbackEngine === 'hlsjs' && qualityLevels.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => changeQuality(-1)}
+                            className={`text-[11px] px-2 py-1 rounded border transition-colors ${
+                              selectedLevel === -1
+                                ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                : 'border-white/10 text-white/60 hover:text-white'
+                            }`}
+                          >
+                            Auto
+                          </button>
+
+                          {qualityLevels.map((level) => (
+                            <button
+                              key={level.index}
+                              type="button"
+                              onClick={() => changeQuality(level.index)}
+                              className={`text-[11px] px-2 py-1 rounded border transition-colors ${
+                                selectedLevel === level.index
+                                  ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                  : 'border-white/10 text-white/60 hover:text-white'
+                              }`}
+                            >
+                              {level.label}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-white/40">
+                          Quality controls unavailable
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold text-white/70 mb-2">Speed</p>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
+                          <button
+                            key={rate}
+                            type="button"
+                            onClick={() => changePlaybackRate(rate)}
+                            className={`text-[11px] px-2 py-1 rounded border transition-colors ${
+                              playbackRate === rate
+                                ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                : 'border-white/10 text-white/60 hover:text-white'
+                            }`}
+                          >
+                            {rate}x
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold text-white/70 mb-2">Subtitles</p>
+
+                      {playbackEngine === 'hlsjs' && subtitleTracks.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          <button
+                            type="button"
+                            onClick={disableSubtitles}
+                            className={`text-[11px] px-2 py-1 rounded border transition-colors ${
+                              selectedSubtitle === -1
+                                ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                : 'border-white/10 text-white/60 hover:text-white'
+                            }`}
+                          >
+                            Off
+                          </button>
+
+                          {subtitleTracks.map((track) => (
+                            <button
+                              key={track.index}
+                              type="button"
+                              onClick={() => changeSubtitleTrack(track.index)}
+                              className={`text-[11px] px-2 py-1 rounded border transition-colors ${
+                                selectedSubtitle === track.index
+                                  ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                  : 'border-white/10 text-white/60 hover:text-white'
+                              }`}
+                            >
+                              {track.label}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-white/40">
+                          No subtitles available
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={toggleFs}
+                aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white
+                          transition-colors cursor-pointer
+                          focus-visible:outline-none focus-visible:ring-2
+                          focus-visible:ring-cinema-accent rounded-full"
+              >
+                {isFullscreen ? (
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.9"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M7 3v4H3" />
+                    <path d="M13 3v4h4" />
+                    <path d="M7 17v-4H3" />
+                    <path d="M13 17v-4h4" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.9"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M3 7V3h4" />
+                    <path d="M13 3h4v4" />
+                    <path d="M3 13v4h4" />
+                    <path d="M17 13v4h-4" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
