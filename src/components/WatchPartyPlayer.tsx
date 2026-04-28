@@ -15,6 +15,7 @@ import {
 } from '@/lib/supabase/realtime'
 import { createBrowserClient } from '@supabase/ssr'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import PartyChat from './PartyChat'
 
 type HlsType = typeof import('hls.js').default
 
@@ -66,11 +67,16 @@ export default function WatchPartyPlayer({
   const hlsRef = useRef<InstanceType<HlsType> | null>(null)
   const channelRef = useRef<RealtimeChannel | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const fullscreenRootRef = useRef<HTMLDivElement>(null)
 
   const currentTimeRef = useRef(initialProgressSecs)
   const durationRef = useRef(0)
   const lastHostTimeRef = useRef(initialProgressSecs)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const [partyChannel, setPartyChannel] = useState<RealtimeChannel | null>(null)
+  const [participantCount, setParticipantCount] = useState(1)
+  const [needsUserStart, setNeedsUserStart] = useState(false)
 
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -105,14 +111,11 @@ export default function WatchPartyPlayer({
     [currentUserId]
   )
 
-  // THIS IS THE PARTICIPATION COUNTER, NOT THE USE STATE FOR THE CHANNEL 
-  const [participantCount, setParticipantCount] = useState(1)
-  const [needsUserStart, setNeedsUserStart] = useState(false)
-
   useEffect(() => {
     const ch = createPartyChannel(roomId)
 
     channelRef.current = ch
+    setPartyChannel(ch)
 
     ch.on<PartyEvent>('broadcast', { event: 'party' }, ({ payload }) => {
       if (!payload || isHost) return
@@ -176,7 +179,8 @@ export default function WatchPartyPlayer({
     })
 
     ch.on('presence', { event: 'sync' }, () => {
-      const state = ch.presenceState()
+      const state = ch.presenceState() as Record<string, unknown[]>
+
       const count = Object.values(state).reduce(
         (total, presences) => total + presences.length,
         0
@@ -185,18 +189,22 @@ export default function WatchPartyPlayer({
       setParticipantCount(Math.max(1, count))
     })
 
-    ch.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED') {
-        await ch.track({
-          user_id: currentUserId,
-          email: userEmail,
-          is_host: isHost,
-          joined_at: new Date().toISOString(),
-        })
-      }
-    })
+    const subscribeTimer = window.setTimeout(() => {
+      ch.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await ch.track({
+            user_id: currentUserId,
+            email: userEmail,
+            is_host: isHost,
+            joined_at: new Date().toISOString(),
+          })
+        }
+      })
+    }, 0)
 
     return () => {
+      window.clearTimeout(subscribeTimer)
+      setPartyChannel(null)
       channelRef.current = null
       destroyPartyChannel(ch)
     }
@@ -356,10 +364,12 @@ export default function WatchPartyPlayer({
     }
 
     const onPause = () => setIsPlaying(false)
+
     const onWaiting = () => {
       setIsLoading(true)
       setSyncStatus('buffering')
     }
+
     const onPlaying = () => {
       setIsLoading(false)
       setSyncStatus('live')
@@ -438,7 +448,10 @@ export default function WatchPartyPlayer({
     if (!video) return
 
     if (video.paused) {
-      video.play().then(() => broadcast('PLAY', video.currentTime))
+      video
+        .play()
+        .then(() => broadcast('PLAY', video.currentTime))
+        .catch(() => setSrcError('Could not start playback.'))
     } else {
       video.pause()
       broadcast('PAUSE', video.currentTime)
@@ -514,7 +527,7 @@ export default function WatchPartyPlayer({
   }
 
   async function toggleFs() {
-    const el = containerRef.current
+    const el = fullscreenRootRef.current
     if (!el) return
 
     if (document.fullscreenElement) {
@@ -536,312 +549,342 @@ export default function WatchPartyPlayer({
 
   return (
     <div
-      ref={containerRef}
-      onDoubleClick={toggleFs}
-      className={`group relative bg-black overflow-hidden select-none ${
-        isFullscreen ? 'fixed inset-0 z-[100]' : 'aspect-video rounded-xl w-full'
-      }`}
+      ref={fullscreenRootRef}
+      className={
+        isFullscreen
+          ? 'fixed inset-0 z-[100] bg-black'
+          : 'flex gap-4 items-start'
+      }
     >
-      <video
-        ref={videoRef}
-        className="w-full h-full object-contain"
-        playsInline
-        preload="metadata"
-        aria-label={`Watch party: ${titleName}`}
-      />
-
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-          <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-cinema-accent animate-spin" />
-        </div>
-      )}
-
-      {guestLocked && !isLoading && (
+      <div className={isFullscreen ? 'w-full h-full' : 'flex-1 min-w-0'}>
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center
-                     bg-black/70 backdrop-blur-sm gap-4"
+          ref={containerRef}
+          onDoubleClick={toggleFs}
+          className={`group relative bg-black overflow-hidden select-none ${
+            isFullscreen ? 'w-full h-full' : 'aspect-video rounded-xl w-full'
+          }`}
         >
-          <div
-            className="w-14 h-14 rounded-full bg-cinema-surface border border-white/10
-                       flex items-center justify-center"
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 22 22"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              className="text-white/40"
-              aria-hidden
+          <video
+            ref={videoRef}
+            className="w-full h-full object-contain"
+            playsInline
+            preload="metadata"
+            aria-label={`Watch party: ${titleName}`}
+          />
+
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+              <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-cinema-accent animate-spin" />
+            </div>
+          )}
+
+          {guestLocked && !isLoading && (
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center
+                         bg-black/70 backdrop-blur-sm gap-4"
             >
-              <rect x="3" y="11" width="16" height="10" rx="2" />
-              <path d="M7 11V7a4 4 0 0 1 8 0v4" />
-            </svg>
-          </div>
-          <p className="text-white/60 text-sm">Waiting for host to start playback…</p>
-        </div>
-      )}
-
-      <button
-        className="absolute inset-0 w-full h-full focus:outline-none"
-        onClick={isHost ? togglePlay : undefined}
-        aria-label={isHost ? (isPlaying ? 'Pause' : 'Play') : 'Controlled by host'}
-        disabled={!isHost}
-      />
-      
-      {needsUserStart && !isHost && !isLoading && (
-        <div
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center
-                    bg-black/70 backdrop-blur-sm gap-4"
-        >
-          <p className="text-white/70 text-sm text-center max-w-sm">
-            Your browser blocked automatic playback. Click below to join the watch party.
-          </p>
+              <div
+                className="w-14 h-14 rounded-full bg-cinema-surface border border-white/10
+                           flex items-center justify-center"
+              >
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 22 22"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="text-white/40"
+                  aria-hidden
+                >
+                  <rect x="3" y="11" width="16" height="10" rx="2" />
+                  <path d="M7 11V7a4 4 0 0 1 8 0v4" />
+                </svg>
+              </div>
+              <p className="text-white/60 text-sm">Waiting for host to start playback…</p>
+            </div>
+          )}
 
           <button
-            type="button"
-            onClick={joinPlayback}
-            className="bg-cinema-accent hover:bg-cinema-accent-hover text-white
-                      font-semibold px-6 py-3 rounded-lg text-sm transition-colors
-                      focus-visible:outline-none focus-visible:ring-2
-                      focus-visible:ring-cinema-accent"
-          >
-            Join playback
-          </button>
-        </div>
-      )}
+            className="absolute inset-0 w-full h-full focus:outline-none"
+            onClick={isHost ? togglePlay : undefined}
+            aria-label={isHost ? (isPlaying ? 'Pause' : 'Play') : 'Controlled by host'}
+            disabled={!isHost}
+          />
 
-      <div
-        className={`absolute inset-0 flex flex-col justify-between pointer-events-none
-                   bg-gradient-to-t from-black/80 via-transparent to-black/30
-                   transition-opacity duration-300
-                   ${controlsVisible || !isPlaying ? 'opacity-100' : 'opacity-0'}`}
-      >
-        <div className="px-5 pt-4 flex items-center justify-between pointer-events-auto">
-          <p className="text-white font-semibold text-sm drop-shadow">{titleName}</p>
-
-          <div className="flex items-center gap-2">
+          {needsUserStart && !isHost && !isLoading && (
             <div
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-sm ${
-                syncStatus === 'live'
-                  ? 'bg-green-500/20 border-green-500/30 text-green-400'
-                  : syncStatus === 'syncing'
-                    ? 'bg-amber-500/20 border-amber-500/30 text-amber-400'
-                    : 'bg-white/10 border-white/20 text-white/40'
-              }`}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center
+                         bg-black/70 backdrop-blur-sm gap-4"
             >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  syncStatus === 'live'
-                    ? 'bg-green-400 animate-pulse'
-                    : syncStatus === 'syncing'
-                      ? 'bg-amber-400'
-                      : 'bg-white/30'
-                }`}
-              />
-              {syncStatus === 'live'
-                ? 'Live'
-                : syncStatus === 'syncing'
-                  ? 'Syncing…'
-                  : 'Buffering'}
-            </div>
+              <p className="text-white/70 text-sm text-center max-w-sm">
+                Your browser blocked automatic playback. Click below to join the watch party.
+              </p>
 
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                isHost
-                  ? 'bg-cinema-accent/20 border-cinema-accent/40 text-cinema-accent'
-                  : 'bg-white/10 border-white/20 text-white/50'
-              }`}
-            >
-              {isHost ? 'Host' : 'Guest'}
-            </span>
-          </div>
-        </div>
-
-        <div className="px-5 pb-5 space-y-3 pointer-events-auto">
-          <div
-            className={`relative h-1 hover:h-1.5 transition-all duration-150 group/seek ${
-              isHost ? '' : 'opacity-50'
-            }`}
-          >
-            <div
-              className="absolute inset-y-0 left-0 bg-white/20 rounded-full"
-              style={{ width: `${buffered}%` }}
-            />
-
-            {isHost && (
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="0.1"
-                value={progress}
-                onChange={handleSeek}
-                aria-label="Seek"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              />
-            )}
-
-            <div
-              className="absolute inset-y-0 left-0 bg-cinema-accent rounded-full"
-              style={{ width: `${progress}%` }}
-            />
-
-            {isHost && (
-              <div
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-cinema-accent rounded-full
-                           opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none
-                           shadow-lg shadow-cinema-accent/50"
-                style={{ left: `calc(${progress}% - 7px)` }}
-              />
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
               <button
-                onClick={isHost ? togglePlay : undefined}
-                disabled={!isHost}
-                aria-label={isPlaying ? 'Pause' : 'Play'}
-                className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors
-                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent
-                            ${
-                              isHost
-                                ? 'text-white hover:text-cinema-accent cursor-pointer'
-                                : 'text-white/20 cursor-not-allowed'
-                            }`}
+                type="button"
+                onClick={joinPlayback}
+                className="bg-cinema-accent hover:bg-cinema-accent-hover text-white
+                           font-semibold px-6 py-3 rounded-lg text-sm transition-colors
+                           focus-visible:outline-none focus-visible:ring-2
+                           focus-visible:ring-cinema-accent"
               >
-                {isPlaying ? (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                    <rect x="4" y="2" width="4" height="16" rx="1" />
-                    <rect x="12" y="2" width="4" height="16" rx="1" />
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                    <path d="M5 2l13 8-13 8V2z" />
-                  </svg>
-                )}
+                Join playback
               </button>
+            </div>
+          )}
 
-              {([-10, 10] as const).map((seconds) => (
-                <button
-                  key={seconds}
-                  onClick={() => skip(seconds)}
-                  disabled={!isHost}
-                  aria-label={`${seconds < 0 ? 'Rewind' : 'Skip'} ${Math.abs(
-                    seconds
-                  )} seconds`}
-                  className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded ${
-                    isHost
-                      ? 'text-white/70 hover:text-white cursor-pointer'
-                      : 'text-white/20 cursor-not-allowed'
+          <div
+            className={`absolute inset-0 flex flex-col justify-between pointer-events-none
+                       bg-gradient-to-t from-black/80 via-transparent to-black/30
+                       transition-opacity duration-300
+                       ${controlsVisible || !isPlaying ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <div className="px-5 pt-4 flex items-center justify-between pointer-events-auto">
+              <p className="text-white font-semibold text-sm drop-shadow">{titleName}</p>
+
+              <div className="flex items-center gap-2">
+                <div
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-sm ${
+                    syncStatus === 'live'
+                      ? 'bg-green-500/20 border-green-500/30 text-green-400'
+                      : syncStatus === 'syncing'
+                        ? 'bg-amber-500/20 border-amber-500/30 text-amber-400'
+                        : 'bg-white/10 border-white/20 text-white/40'
                   }`}
                 >
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                    {seconds < 0 ? (
-                      <>
-                        <path d="M10 3a7 7 0 1 0 6.06 3.5" strokeLinecap="round" />
-                        <path d="M16 2v4.5H11.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </>
-                    ) : (
-                      <>
-                        <path d="M10 3a7 7 0 1 1-6.06 3.5" strokeLinecap="round" />
-                        <path d="M4 2v4.5H8.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </>
-                    )}
-                    <text
-                      x="10"
-                      y="12.5"
-                      textAnchor="middle"
-                      fontSize="5.5"
-                      fill="currentColor"
-                      stroke="none"
-                      fontWeight="600"
-                    >
-                      {Math.abs(seconds)}
-                    </text>
-                  </svg>
-                </button>
-              ))}
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      syncStatus === 'live'
+                        ? 'bg-green-400 animate-pulse'
+                        : syncStatus === 'syncing'
+                          ? 'bg-amber-400'
+                          : 'bg-white/30'
+                    }`}
+                  />
+                  {syncStatus === 'live'
+                    ? 'Live'
+                    : syncStatus === 'syncing'
+                      ? 'Syncing…'
+                      : 'Buffering'}
+                </div>
 
-              <div className="flex items-center gap-2 group/vol">
-                <button
-                  onClick={toggleMute}
-                  aria-label={isMuted ? 'Unmute' : 'Mute'}
-                  className="text-white/70 hover:text-white transition-colors cursor-pointer
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                    isHost
+                      ? 'bg-cinema-accent/20 border-cinema-accent/40 text-cinema-accent'
+                      : 'bg-white/10 border-white/20 text-white/50'
+                  }`}
                 >
-                  {isMuted || volume === 0 ? (
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                      <path d="M3 7h3l5-4v14l-5-4H3V7z" />
-                      <line x1="14" y1="8" x2="18" y2="12" stroke="currentColor" strokeWidth="2" />
-                      <line x1="18" y1="8" x2="14" y2="12" stroke="currentColor" strokeWidth="2" />
-                    </svg>
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                      <path d="M3 7h3l5-4v14l-5-4H3V7z" />
-                      <path d="M13 7.5a4 4 0 0 1 0 5M15.5 5.5a7 7 0 0 1 0 9" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                  )}
-                </button>
+                  {isHost ? 'Host' : 'Guest'}
+                </span>
+              </div>
+            </div>
 
-                <div className="w-0 overflow-hidden group-hover/vol:w-20 transition-all duration-200">
+            <div className="px-5 pb-5 space-y-3 pointer-events-auto">
+              <div
+                className={`relative h-1 hover:h-1.5 transition-all duration-150 group/seek ${
+                  isHost ? '' : 'opacity-50'
+                }`}
+              >
+                <div
+                  className="absolute inset-y-0 left-0 bg-white/20 rounded-full"
+                  style={{ width: `${buffered}%` }}
+                />
+
+                {isHost && (
                   <input
                     type="range"
                     min="0"
-                    max="1"
-                    step="0.05"
-                    value={isMuted ? 0 : volume}
-                    onChange={changeVolume}
-                    aria-label="Volume"
-                    className="w-20 accent-cinema-accent cursor-pointer"
+                    max="100"
+                    step="0.1"
+                    value={progress}
+                    onChange={handleSeek}
+                    aria-label="Seek"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
+                )}
+
+                <div
+                  className="absolute inset-y-0 left-0 bg-cinema-accent rounded-full"
+                  style={{ width: `${progress}%` }}
+                />
+
+                {isHost && (
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-cinema-accent rounded-full
+                               opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none
+                               shadow-lg shadow-cinema-accent/50"
+                    style={{ left: `calc(${progress}% - 7px)` }}
+                  />
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={isHost ? togglePlay : undefined}
+                    disabled={!isHost}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                    className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors
+                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent
+                                ${
+                                  isHost
+                                    ? 'text-white hover:text-cinema-accent cursor-pointer'
+                                    : 'text-white/20 cursor-not-allowed'
+                                }`}
+                  >
+                    {isPlaying ? (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                        <rect x="4" y="2" width="4" height="16" rx="1" />
+                        <rect x="12" y="2" width="4" height="16" rx="1" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                        <path d="M5 2l13 8-13 8V2z" />
+                      </svg>
+                    )}
+                  </button>
+
+                  {([-10, 10] as const).map((seconds) => (
+                    <button
+                      key={seconds}
+                      onClick={() => skip(seconds)}
+                      disabled={!isHost}
+                      aria-label={`${seconds < 0 ? 'Rewind' : 'Skip'} ${Math.abs(
+                        seconds
+                      )} seconds`}
+                      className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded ${
+                        isHost
+                          ? 'text-white/70 hover:text-white cursor-pointer'
+                          : 'text-white/20 cursor-not-allowed'
+                      }`}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                        {seconds < 0 ? (
+                          <>
+                            <path d="M10 3a7 7 0 1 0 6.06 3.5" strokeLinecap="round" />
+                            <path d="M16 2v4.5H11.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </>
+                        ) : (
+                          <>
+                            <path d="M10 3a7 7 0 1 1-6.06 3.5" strokeLinecap="round" />
+                            <path d="M4 2v4.5H8.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </>
+                        )}
+                        <text
+                          x="10"
+                          y="12.5"
+                          textAnchor="middle"
+                          fontSize="5.5"
+                          fill="currentColor"
+                          stroke="none"
+                          fontWeight="600"
+                        >
+                          {Math.abs(seconds)}
+                        </text>
+                      </svg>
+                    </button>
+                  ))}
+
+                  <div className="flex items-center gap-2 group/vol">
+                    <button
+                      onClick={toggleMute}
+                      aria-label={isMuted ? 'Unmute' : 'Mute'}
+                      className="text-white/70 hover:text-white transition-colors cursor-pointer
+                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                    >
+                      {isMuted || volume === 0 ? (
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                          <path d="M3 7h3l5-4v14l-5-4H3V7z" />
+                          <line x1="14" y1="8" x2="18" y2="12" stroke="currentColor" strokeWidth="2" />
+                          <line x1="18" y1="8" x2="14" y2="12" stroke="currentColor" strokeWidth="2" />
+                        </svg>
+                      ) : (
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                          <path d="M3 7h3l5-4v14l-5-4H3V7z" />
+                          <path d="M13 7.5a4 4 0 0 1 0 5M15.5 5.5a7 7 0 0 1 0 9" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        </svg>
+                      )}
+                    </button>
+
+                    <div className="w-0 overflow-hidden group-hover/vol:w-20 transition-all duration-200">
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={isMuted ? 0 : volume}
+                        onChange={changeVolume}
+                        aria-label="Volume"
+                        className="w-20 accent-cinema-accent cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  <span className="text-white/50 text-xs tabular-nums hidden sm:block">
+                    {timeDisplay}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div
+                    className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full
+                               bg-white/10 border border-white/20 text-white/50 text-xs font-semibold"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    {participantCount} watching
+                  </div>
+
+                  <button
+                    onClick={toggleFs}
+                    aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                    className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white
+                               transition-colors cursor-pointer
+                               focus-visible:outline-none focus-visible:ring-2
+                               focus-visible:ring-cinema-accent rounded-full"
+                  >
+                    {isFullscreen ? (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M7 3v4H3" />
+                        <path d="M13 3v4h4" />
+                        <path d="M7 17v-4H3" />
+                        <path d="M13 17v-4h4" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M3 7V3h4" />
+                        <path d="M13 3h4v4" />
+                        <path d="M3 13v4h4" />
+                        <path d="M17 13v4h-4" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
               </div>
-
-              <span className="text-white/50 text-xs tabular-nums hidden sm:block">
-                {timeDisplay}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full
-                          bg-white/10 border border-white/20 text-white/50 text-xs font-semibold"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                {participantCount} watching
-              </div>
-
-              <button
-                onClick={toggleFs}
-                aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-                className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white
-                           transition-colors cursor-pointer
-                           focus-visible:outline-none focus-visible:ring-2
-                           focus-visible:ring-cinema-accent rounded-full"
-              >
-                {isFullscreen ? (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M7 3v4H3" />
-                    <path d="M13 3v4h4" />
-                    <path d="M7 17v-4H3" />
-                    <path d="M13 17v-4h4" />
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M3 7V3h4" />
-                    <path d="M13 3h4v4" />
-                    <path d="M3 13v4h4" />
-                    <path d="M17 13v4h-4" />
-                  </svg>
-                )}
-              </button>
             </div>
           </div>
+
         </div>
       </div>
+
+      {partyChannel && (
+        <div
+          className={
+            isFullscreen
+              ? 'contents'
+              : 'w-72 xl:w-80 flex-shrink-0 h-[calc(56.25vw-2rem)] max-h-[600px] min-h-[400px]'
+          }
+        >
+          <PartyChat
+            channel={partyChannel}
+            currentUserId={currentUserId}
+            userEmail={userEmail}
+            isHost={isHost}
+            isFullscreen={isFullscreen}
+          />
+        </div>
+      )}
     </div>
   )
 }
