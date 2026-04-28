@@ -119,7 +119,14 @@ export async function getWatchlistIds(): Promise<Set<string>> {
 
 // ─── Progress ─────────────────────────────────────────────────────────────────
 
-export async function getProgress(titleId: string): Promise<{ progress_secs: number } | null> {
+export async function getProgress(
+  titleId: string
+): Promise<{
+  progress_secs: number
+  completed_at: string | null
+  is_rewatching: boolean
+  watched_count: number
+} | null> {
   const supabase = await createSupabaseServerClient()
 
   const {
@@ -130,7 +137,7 @@ export async function getProgress(titleId: string): Promise<{ progress_secs: num
 
   const { data, error } = await supabase
     .from('watch_progress')
-    .select('progress_secs')
+    .select('progress_secs, completed_at, is_rewatching, watched_count')
     .eq('user_id', user.id)
     .eq('title_id', titleId)
     .is('episode_id', null)
@@ -155,11 +162,11 @@ export async function getContinueWatching() {
 
   const { data, error } = await supabase
     .from('watch_progress')
-    .select('progress_secs, titles(*)')
+    .select('progress_secs, updated_at, completed_at, is_rewatching, titles(*)')
     .eq('user_id', user.id)
     .is('episode_id', null)
     .gt('progress_secs', 30)
-    .lt('progress_secs', 'duration_mins * 60 - 60')
+    .or('completed_at.is.null,is_rewatching.eq.true')
     .order('updated_at', { ascending: false })
     .limit(10)
 
@@ -173,4 +180,36 @@ export async function getContinueWatching() {
     progress_secs: row.progress_secs as number,
     duration_mins: (row.titles?.duration_mins ?? null) as number | null,
   }))
+}
+
+export async function getWatchedTitleIds() {
+  const supabase = await createSupabaseServerClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return new Set<string>()
+
+  const { data, error } = await supabase
+    .from('watch_progress')
+    .select('title_id')
+    .eq('user_id', user.id)
+    .is('episode_id', null)
+    .not('completed_at', 'is', null)
+
+  if (error) {
+    console.error('Failed to get watched title ids:', error)
+    return new Set<string>()
+  }
+
+  type WatchedTitleRow = {
+    title_id: string | null
+  }
+
+  return new Set<string>(
+    ((data ?? []) as WatchedTitleRow[])
+      .map((row) => row.title_id)
+      .filter((id): id is string => Boolean(id))
+  )
 }

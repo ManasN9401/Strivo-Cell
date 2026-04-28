@@ -10,6 +10,7 @@ import type { Title } from '@/types'
 interface Props {
   title: Title
   inWatchlist?: boolean
+  watched?: boolean
   priority?: boolean
 }
 
@@ -23,6 +24,7 @@ function fmt(mins: number | null, type: string) {
 export default function MovieCard({
   title,
   inWatchlist = false,
+  watched = false,
   priority = false,
 }: Props) {
   const [isInList, setIsInList] = useState(inWatchlist)
@@ -83,6 +85,17 @@ export default function MovieCard({
         >
           {title.rating}
         </span>
+
+        {/* Watched badge */}
+        {watched && (
+          <span
+            className="absolute top-2 right-2 z-20 bg-black/70 text-green-400
+                       text-[10px] font-semibold px-2 py-0.5 rounded-full
+                       border border-green-400/30 backdrop-blur-sm pointer-events-none"
+          >
+            Watched
+          </span>
+        )}
 
         {/* Hover overlay */}
         <div
