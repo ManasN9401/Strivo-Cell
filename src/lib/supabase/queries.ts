@@ -159,6 +159,7 @@ export async function getContinueWatching() {
     .eq('user_id', user.id)
     .is('episode_id', null)
     .gt('progress_secs', 30)
+    .lt('progress_secs', 'duration_mins * 60 - 60')
     .order('updated_at', { ascending: false })
     .limit(10)
 
