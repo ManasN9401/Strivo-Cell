@@ -1,16 +1,27 @@
 # CINEMA — Streaming Platform
 
+<p>
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=nextdotjs" />
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-Ready-3178C6?style=flat-square&logo=typescript&logoColor=white" />
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind-CSS-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white" />
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-Auth%20%7C%20Storage%20%7C%20Realtime-3ECF8E?style=flat-square&logo=supabase&logoColor=white" />
+  <img alt="Vercel" src="https://img.shields.io/badge/Deploy-Vercel-black?style=flat-square&logo=vercel" />
+  <img alt="License" src="https://img.shields.io/badge/license-All%20Rights%20Reserved-red?style=flat-square" />
+</p>
+
 A full-stack Netflix-style streaming platform built with **Next.js 15**, Supabase, and Tailwind CSS.
 
 ## Features
 
-- 🎬 **HLS video playback** — Secure streaming via signed URLs
-- 🔐 **Authentication** — Supabase Auth with protected routes
-- 📚 **My List** — Persistent watchlist with optimistic UI
-- ▶️ **Continue Watching** — Progress tracking across sessions
-- 🎉 **Watch Parties** — Real-time sync via Supabase Realtime
-- 🔍 **Search** — Live title search
-- 📱 **Responsive** — Mobile-first design
+- **Secure HLS playback** — Private adaptive streaming through Supabase Edge Functions and signed Storage URLs
+- **Authentication** — Supabase Auth with protected routes and session-aware server rendering
+- **My List** — Persistent watchlist with optimistic UI updates
+- **Continue Watching** — Watch progress saved across sessions
+- **Watch Parties** — Realtime synchronized playback using Supabase Realtime
+- **Party Chat** — Live chat and emoji reactions during watch parties
+- **Search** — Live title search
+- **Responsive UI** — Mobile-first interface styled with Tailwind CSS
 
 ## Tech Stack
 
@@ -129,7 +140,7 @@ supabase/
 4. Guests navigate to the link, join the Realtime presence channel
 5. Host presses play → `PLAY` event broadcasts to all guests
 6. Guests apply events with latency compensation
-7. Host broadcasts a `SYNC` ping every 5 seconds; guests correct drift > 2s
+7. Host broadcasts a `SYNC` ping every 10 seconds; guests correct drift when needed
 
 ---
 
