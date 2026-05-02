@@ -38,14 +38,15 @@ export default async function WatchPage({ params }: Props) {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [video, title] = await Promise.all([
+  const [video, title, progress] = await Promise.all([
     getVideoById(videoId),
     getTitle(videoId),
+    getProgress(videoId),
   ])
 
   if (title) {
     const related = await getRelatedTitles(title.id, title.genre?.[0] ?? '')
-    return renderTitleWatchPage(title, related)
+    return renderTitleWatchPage(title, related, progress)
   }
 
   if (!video) notFound()
@@ -60,14 +61,22 @@ export default async function WatchPage({ params }: Props) {
   return renderCreatorWatchPage(video, comments, chapters, recommended, likeState, user?.id ?? null)
 }
 
-function renderTitleWatchPage(title: Title, related: Title[]) {
+function renderTitleWatchPage(
+  title: Title,
+  related: Title[],
+  progress: Awaited<ReturnType<typeof getProgress>> | null,
+) {
   return (
     <main className="bg-cinema-bg min-h-screen pt-20 pb-16">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 xl:grid-cols-[1.3fr,420px]">
           <div className="space-y-8">
             <div className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.6)]">
-              <VideoPlayerWrapper titleId={title.id} titleName={title.title} />
+              <VideoPlayerWrapper
+                titleId={title.id}
+                titleName={title.title}
+                initialProgressSecs={progress?.progress_secs ?? 0}
+              />
             </div>
 
             <div className="space-y-4">

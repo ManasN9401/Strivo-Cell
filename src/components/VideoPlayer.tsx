@@ -335,8 +335,35 @@ export default function VideoPlayer({
     }
 
     function onKeyDown(e: KeyboardEvent) {
+      const target = e.target
+      if (
+        target instanceof HTMLElement &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+      ) {
+        return
+      }
+
       if (e.key === 'Escape') {
         setShowSettings(false)
+        return
+      }
+
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault()
+        togglePlay()
+        return
+      }
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        skip(10)
+        return
+      }
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        skip(-10)
+        return
       }
     }
 
