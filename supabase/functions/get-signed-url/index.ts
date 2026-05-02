@@ -225,18 +225,17 @@ async function getAuthedClients(
   req: Request
 ): Promise<{ admin: AdminClient; errorResponse?: never } | { admin?: never; errorResponse: Response }> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
-  const adminKey =
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SERVICE_ROLE_KEY')
+  const publishableKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY')
+  const secretKey = Deno.env.get('SUPABASE_SECRET_KEY')
 
-  if (!supabaseUrl || !anonKey || !adminKey) {
+  if (!supabaseUrl || !publishableKey || !secretKey) {
     return {
       errorResponse: json(
         {
           error: 'Missing Edge Function environment variables',
           hasSupabaseUrl: Boolean(supabaseUrl),
-          hasAnonKey: Boolean(anonKey),
-          hasAdminKey: Boolean(adminKey),
+          hasPublishableKey: Boolean(publishableKey),
+          hasSecretKey: Boolean(secretKey),
         },
         500
       ),
@@ -249,7 +248,7 @@ async function getAuthedClients(
     return { errorResponse: json({ error: 'Unauthorized' }, 401) }
   }
 
-  const userClient = createClient(supabaseUrl, anonKey, {
+  const userClient = createClient(supabaseUrl, publishableKey, {
     global: {
       headers: {
         Authorization: authHeader,
@@ -266,7 +265,7 @@ async function getAuthedClients(
     return { errorResponse: json({ error: 'Unauthorized' }, 401) }
   }
 
-  const admin = createClient(supabaseUrl, adminKey, {
+  const admin = createClient(supabaseUrl, secretKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

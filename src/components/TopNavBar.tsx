@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { signOut } from '@/lib/actions/auth'
 import NavSearch from './NavSearch'
 import { NavLinks } from './NavLinks'
+import ModeToggle from './creators/ModeToggle'
 
 interface Props {
   activePath?: string
@@ -32,6 +33,8 @@ export default async function TopNavBar({ activePath: _activePath }: Props) {
 
         {/* Animated nav links — hidden on mobile */}
         <NavLinks />
+
+        <ModeToggle />
 
         {/* Right side */}
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">

@@ -59,7 +59,7 @@
   - playlist download failure
   - segment signing failure
 - Set/used:
-  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `SUPABASE_SECRET_KEY`
 
 ## Video Player
 

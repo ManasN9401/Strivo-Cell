@@ -7,14 +7,19 @@ const supabaseUrl =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 const supabaseKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl) {
-  throw new Error("Missing SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL in .env.local");
+  throw new Error(
+    "Missing SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL in .env.local"
+  );
 }
 
 if (!supabaseKey) {
-  throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY in .env.local");
+  throw new Error("Missing SUPABASE_SECRET_KEY in .env.local");
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);

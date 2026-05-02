@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
         hostname:  '*.supabase.co',
         pathname:  '/storage/v1/object/public/**',
       },
+      { protocol: 'https', hostname: 'placehold.co' },
     ],
   },
   webpack: (config, { isServer }) => {
@@ -16,6 +17,11 @@ const nextConfig: NextConfig = {
       config.externals = [...(config.externals ?? []), 'hls.js']
     }
     return config
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10gb',
+    },
   },
 }
 
