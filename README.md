@@ -83,8 +83,8 @@ npm install -g supabase
 supabase login
 supabase link --project-ref YOUR_PROJECT_REF
 supabase functions deploy get-signed-url --no-verify-jwt
-supabase secrets set SUPABASE_PUBLISHABLE_KEY=your-publishable-key
-supabase secrets set SUPABASE_SECRET_KEY=your-secret-key
+supabase secrets set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+supabase secrets set NEXT_SUPABASE_SECRET_KEY=your-secret-key
 ```
 
 ### 7. Run locally
@@ -104,7 +104,7 @@ Open [http://localhost:3000](http://localhost:3000)
 3. Add environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-   - `SUPABASE_SECRET_KEY`
+   - `NEXT_SUPABASE_SECRET_KEY`
    - `NEXT_PUBLIC_SITE_URL` (your Vercel URL)
 4. Deploy
 

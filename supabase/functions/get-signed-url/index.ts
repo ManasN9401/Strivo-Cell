@@ -70,10 +70,10 @@ function isAbsoluteUrl(path: string) {
 }
 
 function makeFunctionPlaylistUrl(titleId: string, quality: string, playlistPath: string) {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')?.replace(/\/+$/, '')
+  const supabaseUrl = Deno.env.get('NEXT_PUBLIC_SUPABASE_URL')?.replace(/\/+$/, '')
 
   if (!supabaseUrl) {
-    throw new Error('Missing SUPABASE_URL')
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL')
   }
 
   const url = new URL(`${supabaseUrl}/functions/v1/get-signed-url/`)
@@ -224,9 +224,9 @@ async function rewritePlaylist({
 async function getAuthedClients(
   req: Request
 ): Promise<{ admin: AdminClient; errorResponse?: never } | { admin?: never; errorResponse: Response }> {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')
-  const publishableKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY')
-  const secretKey = Deno.env.get('SUPABASE_SECRET_KEY')
+  const supabaseUrl = Deno.env.get('NEXT_PUBLIC_SUPABASE_URL')
+  const publishableKey = Deno.env.get('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY')
+  const secretKey = Deno.env.get('NEXT_SUPABASE_SECRET_KEY')
 
   if (!supabaseUrl || !publishableKey || !secretKey) {
     return {
