@@ -5,6 +5,8 @@ node_modules/
 .next/
 out/
 .vercel/
+.turbo/
+.eslintcache
 
 # production/build output
 dist/
