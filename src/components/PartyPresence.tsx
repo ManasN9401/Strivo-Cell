@@ -51,7 +51,7 @@ export default function PartyPresence({ channel, currentUserId, userEmail, isHos
             style={{ zIndex: members.length - i }}
             aria-label={m.email}
             className={`relative w-7 h-7 rounded-full flex items-center justify-center
-                        text-white text-[10px] font-bold border-2 border-cinema-bg
+                        text-white text-[10px] font-bold border-2 border-strivo-bg
                         ${avatarColor(m.user_id)}`}
           >
             {initials(m.email)}
@@ -62,7 +62,7 @@ export default function PartyPresence({ channel, currentUserId, userEmail, isHos
           </div>
         ))}
         {members.length > 7 && (
-          <div className="w-7 h-7 rounded-full bg-cinema-surface border-2 border-cinema-bg
+          <div className="w-7 h-7 rounded-full bg-strivo-surface border-2 border-strivo-bg
                           flex items-center justify-center text-white/50 text-[10px] font-bold">
             +{members.length - 7}
           </div>

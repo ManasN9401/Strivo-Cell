@@ -52,18 +52,18 @@ export default function UploadZone({ onFile }: Props) {
           'w-full flex flex-col items-center justify-center gap-4',
           'border-2 border-dashed rounded-2xl py-16 px-8 cursor-pointer',
           'transition-all duration-200',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent',
           dragging
-            ? 'border-cinema-accent bg-cinema-accent/10 scale-[1.01]'
-            : 'border-white/10 hover:border-white/20 bg-cinema-surface hover:bg-white/[0.03]',
+            ? 'border-strivo-accent bg-strivo-accent/10 scale-[1.01]'
+            : 'border-white/10 hover:border-white/20 bg-strivo-surface hover:bg-white/[0.03]',
         ].join(' ')}
       >
         <div className={[
           'w-16 h-16 rounded-full flex items-center justify-center transition-colors',
-          dragging ? 'bg-cinema-accent/20' : 'bg-white/5',
+          dragging ? 'bg-strivo-accent/20' : 'bg-white/5',
         ].join(' ')}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               strokeWidth="1.8" className={dragging ? 'text-cinema-accent' : 'text-white/40'}
+               strokeWidth="1.8" className={dragging ? 'text-strivo-accent' : 'text-white/40'}
                aria-hidden>
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="17 8 12 3 7 8"/>

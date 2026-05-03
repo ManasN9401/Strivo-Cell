@@ -1,20 +1,30 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { useTransition } from 'react'
+import { useTransition, useState, useEffect } from 'react'
 
 export default function ModeToggle() {
   const pathname = usePathname()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [squish, setSquish] = useState(false)
 
-  const isCreators = pathname.startsWith('/creators')
+  const [localMode, setLocalMode] = useState<'cinema' | 'creators'>(
+    pathname.startsWith('/creators') ? 'creators' : 'cinema'
+  )
+
+  useEffect(() => {
+    setLocalMode(pathname.startsWith('/creators') ? 'creators' : 'cinema')
+  }, [pathname])
+
+  const isCreators = localMode === 'creators'
 
   function switchMode(mode: 'cinema' | 'creators') {
-    if (mode === 'cinema' && isCreators) {
-      startTransition(() => router.push('/'))
-    } else if (mode === 'creators' && !isCreators) {
-      startTransition(() => router.push('/creators'))
+    if (mode !== localMode) {
+      setLocalMode(mode)
+      setSquish(true)
+      setTimeout(() => setSquish(false), 150)
+      startTransition(() => router.push(mode === 'cinema' ? '/' : '/creators'))
     }
   }
 
@@ -22,9 +32,21 @@ export default function ModeToggle() {
     <div
       role="group"
       aria-label="Switch viewing mode"
-      className="hidden sm:flex items-center gap-0.5 bg-white/[0.06] border border-white/[0.08]
+      className="relative hidden sm:flex items-center gap-0.5 bg-white/[0.06] border border-white/[0.08]
                  rounded-full p-0.5 shrink-0"
     >
+      <div
+        className={`absolute inset-y-0.5 rounded-full shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-300 ease-in-out z-0 ${
+          isCreators 
+            ? 'bg-gradient-to-r from-cyan-400 to-blue-500' 
+            : 'bg-gradient-to-r from-blue-500 to-cyan-400'
+        }`}
+        style={{
+          left: isCreators ? 'calc(50% + 1px)' : '2px',
+          width: 'calc(50% - 3px)',
+          transform: squish ? 'scaleX(0.6)' : 'scaleX(1)'
+        }}
+      />
       <ModeButton
         label="Cinema"
         icon={
@@ -70,11 +92,11 @@ function ModeButton({ label, icon, active, pending, onClick }: ModeButtonProps) 
       aria-pressed={active}
       disabled={active || pending}
       className={[
-        'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold',
-        'transition-all duration-200 cursor-pointer min-h-[32px]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent',
+        'relative z-10 flex flex-1 items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold',
+        'transition-colors duration-200 cursor-pointer min-h-[32px] w-[90px]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent',
         active
-          ? 'bg-cinema-accent text-white shadow-[0_0_12px_rgba(9,21,230,0.4)]'
+          ? 'text-white'
           : 'text-white/50 hover:text-white/80 disabled:cursor-default',
       ].join(' ')}
     >

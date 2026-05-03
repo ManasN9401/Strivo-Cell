@@ -44,3 +44,39 @@ export async function updatePassword(formData: FormData) {
 export async function deleteAccount() {
   redirect('/settings?error=Account+deletion+must+be+done+via+support')
 }
+
+export async function updateProfile(formData: FormData) {
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const username = formData.get('username') as string
+  const bio = formData.get('bio') as string
+  const avatar_url = formData.get('avatar_url') as string
+  const social_twitter = formData.get('social_twitter') as string
+  const social_youtube = formData.get('social_youtube') as string
+  const social_instagram = formData.get('social_instagram') as string
+
+  const { error } = await supabase.from('profiles').upsert({
+    id: user.id,
+    username: username || null,
+    bio,
+    avatar_url,
+    social_twitter,
+    social_youtube,
+    social_instagram,
+    updated_at: new Date().toISOString(),
+  })
+
+  if (error) {
+    redirect(`/settings?error=${encodeURIComponent(error.message)}`)
+  }
+
+  revalidatePath('/settings')
+  redirect('/settings?success=profile-updated')
+}

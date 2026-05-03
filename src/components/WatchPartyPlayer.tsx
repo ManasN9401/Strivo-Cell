@@ -441,6 +441,47 @@ export default function WatchPartyPlayer({
     return () => document.removeEventListener('fullscreenchange', onFs)
   }, [])
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const target = e.target
+      if (
+        target instanceof HTMLElement &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+      ) {
+        return
+      }
+
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault()
+        toggleFs()
+        return
+      }
+
+      if (isHost) {
+        if (e.key === ' ' || e.code === 'Space') {
+          e.preventDefault()
+          togglePlay()
+          return
+        }
+
+        if (e.key === 'ArrowRight') {
+          e.preventDefault()
+          skip(10)
+          return
+        }
+
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault()
+          skip(-10)
+          return
+        }
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [isHost])
+
   function togglePlay() {
     if (!isHost) return
 
@@ -559,7 +600,6 @@ export default function WatchPartyPlayer({
       <div className={isFullscreen ? 'w-full h-full' : 'flex-1 min-w-0'}>
         <div
           ref={containerRef}
-          onDoubleClick={toggleFs}
           className={`group relative bg-black overflow-hidden select-none ${
             isFullscreen ? 'w-full h-full' : 'aspect-video rounded-xl w-full'
           }`}
@@ -574,7 +614,7 @@ export default function WatchPartyPlayer({
 
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-              <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-cinema-accent animate-spin" />
+              <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-strivo-accent animate-spin" />
             </div>
           )}
 
@@ -584,7 +624,7 @@ export default function WatchPartyPlayer({
                          bg-black/70 backdrop-blur-sm gap-4"
             >
               <div
-                className="w-14 h-14 rounded-full bg-cinema-surface border border-white/10
+                className="w-14 h-14 rounded-full bg-strivo-surface border border-white/10
                            flex items-center justify-center"
               >
                 <svg
@@ -624,10 +664,10 @@ export default function WatchPartyPlayer({
               <button
                 type="button"
                 onClick={joinPlayback}
-                className="bg-cinema-accent hover:bg-cinema-accent-hover text-white
+                className="bg-strivo-accent hover:bg-strivo-accent-hover text-white
                            font-semibold px-6 py-3 rounded-lg text-sm transition-colors
                            focus-visible:outline-none focus-visible:ring-2
-                           focus-visible:ring-cinema-accent"
+                           focus-visible:ring-strivo-accent"
               >
                 Join playback
               </button>
@@ -672,7 +712,7 @@ export default function WatchPartyPlayer({
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-bold border ${
                     isHost
-                      ? 'bg-cinema-accent/20 border-cinema-accent/40 text-cinema-accent'
+                      ? 'bg-strivo-accent/20 border-strivo-accent/40 text-strivo-accent'
                       : 'bg-white/10 border-white/20 text-white/50'
                   }`}
                 >
@@ -706,15 +746,15 @@ export default function WatchPartyPlayer({
                 )}
 
                 <div
-                  className="absolute inset-y-0 left-0 bg-cinema-accent rounded-full"
+                  className="absolute inset-y-0 left-0 bg-strivo-accent rounded-full"
                   style={{ width: `${progress}%` }}
                 />
 
                 {isHost && (
                   <div
-                    className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-cinema-accent rounded-full
+                    className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-strivo-accent rounded-full
                                opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none
-                               shadow-lg shadow-cinema-accent/50"
+                               shadow-lg shadow-strivo-accent/50"
                     style={{ left: `calc(${progress}% - 7px)` }}
                   />
                 )}
@@ -727,10 +767,10 @@ export default function WatchPartyPlayer({
                     disabled={!isHost}
                     aria-label={isPlaying ? 'Pause' : 'Play'}
                     className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors
-                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent
+                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent
                                 ${
                                   isHost
-                                    ? 'text-white hover:text-cinema-accent cursor-pointer'
+                                    ? 'text-white hover:text-strivo-accent cursor-pointer'
                                     : 'text-white/20 cursor-not-allowed'
                                 }`}
                   >
@@ -754,7 +794,7 @@ export default function WatchPartyPlayer({
                       aria-label={`${seconds < 0 ? 'Rewind' : 'Skip'} ${Math.abs(
                         seconds
                       )} seconds`}
-                      className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded ${
+                      className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded ${
                         isHost
                           ? 'text-white/70 hover:text-white cursor-pointer'
                           : 'text-white/20 cursor-not-allowed'
@@ -792,7 +832,7 @@ export default function WatchPartyPlayer({
                       onClick={toggleMute}
                       aria-label={isMuted ? 'Unmute' : 'Mute'}
                       className="text-white/70 hover:text-white transition-colors cursor-pointer
-                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
                     >
                       {isMuted || volume === 0 ? (
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
@@ -817,7 +857,7 @@ export default function WatchPartyPlayer({
                         value={isMuted ? 0 : volume}
                         onChange={changeVolume}
                         aria-label="Volume"
-                        className="w-20 accent-cinema-accent cursor-pointer"
+                        className="w-20 accent-strivo-accent cursor-pointer"
                       />
                     </div>
                   </div>
@@ -842,7 +882,7 @@ export default function WatchPartyPlayer({
                     className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white
                                transition-colors cursor-pointer
                                focus-visible:outline-none focus-visible:ring-2
-                               focus-visible:ring-cinema-accent rounded-full"
+                               focus-visible:ring-strivo-accent rounded-full"
                   >
                     {isFullscreen ? (
                       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

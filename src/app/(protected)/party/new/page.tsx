@@ -34,7 +34,7 @@ export default async function NewPartyPage({ searchParams }: Props) {
 
   return (
     <>
-      <main className="bg-cinema-bg min-h-screen pt-20">
+      <main className="bg-strivo-bg min-h-screen pt-20">
         <div className="max-w-content mx-auto px-8 py-12">
           <div className="mb-10">
             <h1 className="text-4xl font-black tracking-tight mb-2">Start a Watch Party</h1>
@@ -50,10 +50,10 @@ export default async function NewPartyPage({ searchParams }: Props) {
                   type="submit"
                   className="group w-full text-left cursor-pointer
                              focus-visible:outline-none focus-visible:ring-2
-                             focus-visible:ring-cinema-accent rounded-lg"
+                             focus-visible:ring-strivo-accent rounded-lg"
                 >
                   <div
-                    className="relative aspect-[2/3] rounded-lg overflow-hidden bg-cinema-surface
+                    className="relative aspect-[2/3] rounded-lg overflow-hidden bg-strivo-surface
                                transition-transform duration-200 group-hover:scale-105"
                   >
                     {title.poster_path && (
@@ -66,11 +66,11 @@ export default async function NewPartyPage({ searchParams }: Props) {
                       />
                     )}
                     <div
-                      className="absolute inset-0 bg-cinema-accent/0 group-hover:bg-cinema-accent/20
+                      className="absolute inset-0 bg-strivo-accent/0 group-hover:bg-strivo-accent/20
                                  transition-colors duration-200 flex items-center justify-center"
                     >
                       <div
-                        className="w-11 h-11 rounded-full bg-cinema-accent flex items-center justify-center
+                        className="w-11 h-11 rounded-full bg-strivo-accent flex items-center justify-center
                                    opacity-0 group-hover:opacity-100 transition-opacity shadow-xl"
                       >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="white" aria-hidden>
@@ -81,7 +81,7 @@ export default async function NewPartyPage({ searchParams }: Props) {
                   </div>
                   <p
                     className="mt-2 text-white text-xs font-semibold truncate px-0.5
-                               group-hover:text-cinema-accent transition-colors"
+                               group-hover:text-strivo-accent transition-colors"
                   >
                     {title.title}
                   </p>

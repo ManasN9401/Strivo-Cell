@@ -6,7 +6,7 @@ const VideoPlayer = dynamic(() => import('./VideoPlayer'), {
   ssr: false,
   loading: () => (
     <div className="aspect-video bg-black rounded-xl flex items-center justify-center">
-      <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-cinema-accent animate-spin"/>
+      <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-strivo-accent animate-spin"/>
     </div>
   ),
 })

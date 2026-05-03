@@ -45,7 +45,7 @@ export default async function TitleDetailPage({ params }: Props) {
 
   return (
     <>
-      <main className="bg-cinema-bg min-h-screen">
+      <main className="bg-strivo-bg min-h-screen">
         <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
           {title.backdrop_path && (
             <Image
@@ -57,15 +57,15 @@ export default async function TitleDetailPage({ params }: Props) {
               sizes="100vw"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-cinema-bg via-cinema-bg/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-cinema-bg/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-strivo-bg via-strivo-bg/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-strivo-bg/60 to-transparent" />
         </section>
 
         <div className="max-w-content mx-auto px-8 -mt-48 relative z-10 pb-20">
           <div className="flex flex-col md:flex-row gap-10">
             <div
               className="relative w-40 sm:w-52 flex-shrink-0 aspect-[2/3] rounded-xl
-                         overflow-hidden bg-cinema-surface shadow-2xl self-start"
+                         overflow-hidden bg-strivo-surface shadow-2xl self-start"
             >
               {title.poster_path && (
                 <Image
@@ -86,10 +86,10 @@ export default async function TitleDetailPage({ params }: Props) {
                     key={g}
                     href={`/browse?genre=${encodeURIComponent(g)}`}
                     className="text-[11px] font-bold uppercase tracking-widest
-                               text-cinema-accent border border-cinema-accent/40
-                               px-2.5 py-1 rounded-full hover:bg-cinema-accent/10
+                               text-strivo-accent border border-strivo-accent/40
+                               px-2.5 py-1 rounded-full hover:bg-strivo-accent/10
                                transition-colors focus-visible:outline-none
-                               focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                               focus-visible:ring-2 focus-visible:ring-strivo-accent"
                   >
                     {g}
                   </Link>
@@ -151,7 +151,7 @@ export default async function TitleDetailPage({ params }: Props) {
                                text-white font-semibold px-6 py-3.5 rounded-lg text-sm
                                border border-white/10 transition-colors cursor-pointer
                                focus-visible:outline-none focus-visible:ring-2
-                               focus-visible:ring-cinema-accent"
+                               focus-visible:ring-strivo-accent"
                   >
                     <span aria-hidden>{inWatchlist ? '✓' : '+'}</span>
                     {inWatchlist ? 'In My List' : 'Add to My List'}
@@ -161,12 +161,12 @@ export default async function TitleDetailPage({ params }: Props) {
                 <form action={createPartyRoom.bind(null, title.id)}>
                   <button
                     type="submit"
-                    className="flex items-center gap-2 bg-cinema-accent/10
-                               hover:bg-cinema-accent/20 text-cinema-accent font-semibold
-                               px-6 py-3.5 rounded-lg text-sm border border-cinema-accent/30
+                    className="flex items-center gap-2 bg-strivo-accent/10
+                               hover:bg-strivo-accent/20 text-strivo-accent font-semibold
+                               px-6 py-3.5 rounded-lg text-sm border border-strivo-accent/30
                                transition-colors cursor-pointer
                                focus-visible:outline-none focus-visible:ring-2
-                               focus-visible:ring-cinema-accent"
+                               focus-visible:ring-strivo-accent"
                   >
                     ◈ Watch Party
                   </button>

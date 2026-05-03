@@ -1,4 +1,4 @@
-# CINEMA — Streaming Platform
+# Strivo Cell — Streaming Platform
 
 <p>
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=nextdotjs" />
@@ -42,8 +42,8 @@ A full-stack Netflix-style streaming platform built with **Next.js 15**, Supabas
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-org/cinema.git
-cd cinema
+git clone https://github.com/your-org/strivo.git
+cd strivo
 npm install
 ```
 

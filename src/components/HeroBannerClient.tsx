@@ -47,8 +47,8 @@ export default function HeroBannerClient({ titles }: { titles: Title[] }) {
             sizes="100vw"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-cinema-bg via-cinema-bg/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-cinema-bg/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-strivo-bg via-strivo-bg/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-strivo-bg/80 via-transparent to-transparent" />
       </div>
 
       {/* Content */}
@@ -60,7 +60,7 @@ export default function HeroBannerClient({ titles }: { titles: Title[] }) {
         <div className="flex flex-wrap gap-2 mb-4">
           {t.genre?.slice(0, 2).map(g => (
             <span key={g} className="text-[11px] font-bold uppercase tracking-widest
-                                      text-cinema-accent border border-cinema-accent/40
+                                      text-strivo-accent border border-strivo-accent/40
                                       px-2.5 py-1 rounded-full">
               {g}
             </span>
@@ -123,8 +123,8 @@ export default function HeroBannerClient({ titles }: { titles: Title[] }) {
                 onClick={() => goTo(i)}
                 className={[
                   'h-0.5 rounded-full transition-all duration-300 cursor-pointer',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent',
-                  i === current ? 'w-8 bg-cinema-accent' : 'w-4 bg-white/30 hover:bg-white/50',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent',
+                  i === current ? 'w-8 bg-strivo-accent' : 'w-4 bg-white/30 hover:bg-white/50',
                 ].join(' ')}
               />
             ))}

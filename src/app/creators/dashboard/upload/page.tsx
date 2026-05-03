@@ -110,7 +110,7 @@ export default function UploadPage() {
   // ── Select file ─────────────────────────────────────────────────────────────
   if (step === 'select') {
     return (
-      <main className="bg-cinema-bg min-h-screen pt-24 pb-20">
+      <main className="bg-strivo-bg min-h-screen pt-24 pb-20">
         <div className="max-w-2xl mx-auto px-6">
           <BackLink />
           <h1 className="text-white text-2xl font-bold mb-8">Upload video</h1>
@@ -123,9 +123,9 @@ export default function UploadPage() {
   // ── Uploading ───────────────────────────────────────────────────────────────
   if (step === 'uploading') {
     return (
-      <main className="bg-cinema-bg min-h-screen pt-24 pb-20 flex items-center justify-center">
+      <main className="bg-strivo-bg min-h-screen pt-24 pb-20 flex items-center justify-center">
         <div className="text-center space-y-6 px-6 max-w-sm w-full">
-          <div className="w-16 h-16 rounded-full bg-cinema-accent/20 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-strivo-accent/20 flex items-center justify-center mx-auto">
             <svg className="animate-spin" width="28" height="28" viewBox="0 0 24 24"
                  fill="none" stroke="#0915e6" strokeWidth="2" aria-hidden>
               <circle cx="12" cy="12" r="10" strokeOpacity=".3"/>
@@ -137,9 +137,9 @@ export default function UploadPage() {
             <p className="text-white/40 text-sm mt-1">{meta.title}</p>
           </div>
           <div className="space-y-2">
-            <div className="h-2 bg-cinema-surface rounded-full overflow-hidden">
+            <div className="h-2 bg-strivo-surface rounded-full overflow-hidden">
               <div
-                className="h-full bg-cinema-accent rounded-full transition-all duration-300"
+                className="h-full bg-strivo-accent rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
                 role="progressbar"
                 aria-valuenow={progress}
@@ -158,7 +158,7 @@ export default function UploadPage() {
   // ── Done ────────────────────────────────────────────────────────────────────
   if (step === 'done') {
     return (
-      <main className="bg-cinema-bg min-h-screen pt-24 pb-20 flex items-center justify-center">
+      <main className="bg-strivo-bg min-h-screen pt-24 pb-20 flex items-center justify-center">
         <div className="text-center space-y-6 px-6 max-w-sm">
           <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e"
@@ -175,9 +175,9 @@ export default function UploadPage() {
           <div className="flex flex-col gap-3">
             <button
               onClick={() => router.push('/creators/dashboard')}
-              className="w-full bg-cinema-accent hover:bg-cinema-accent/90 text-white
+              className="w-full bg-strivo-accent hover:bg-strivo-accent/90 text-white
                          font-semibold py-3 rounded-xl transition-colors cursor-pointer
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
             >
               Go to dashboard
             </button>
@@ -189,9 +189,9 @@ export default function UploadPage() {
                 setThumbnail(null)
                 setProgress(0)
               }}
-              className="w-full bg-cinema-surface hover:bg-white/10 text-white/70 hover:text-white
+              className="w-full bg-strivo-surface hover:bg-white/10 text-white/70 hover:text-white
                          font-semibold py-3 rounded-xl transition-colors cursor-pointer
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
             >
               Upload another
             </button>
@@ -203,13 +203,13 @@ export default function UploadPage() {
 
   // ── Details form ────────────────────────────────────────────────────────────
   return (
-    <main className="bg-cinema-bg min-h-screen pt-24 pb-20">
+    <main className="bg-strivo-bg min-h-screen pt-24 pb-20">
       <div className="max-w-2xl mx-auto px-6">
         <BackLink onClick={() => setStep('select')} />
         <h1 className="text-white text-2xl font-bold mb-8">Video details</h1>
 
         {videoFile && (
-          <div className="flex items-center gap-3 bg-cinema-surface rounded-xl px-4 py-3 mb-8
+          <div className="flex items-center gap-3 bg-strivo-surface rounded-xl px-4 py-3 mb-8
                           border border-white/[0.06]">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0915e6"
                  strokeWidth="2" aria-hidden>
@@ -225,7 +225,7 @@ export default function UploadPage() {
             <button
               onClick={() => setStep('select')}
               className="text-white/30 hover:text-white text-xs transition-colors cursor-pointer
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
             >
               Change
             </button>
@@ -251,10 +251,10 @@ export default function UploadPage() {
         <button
           onClick={handleSubmit}
           disabled={!meta.title.trim()}
-          className="mt-8 w-full bg-cinema-accent hover:bg-cinema-accent/90 text-white
+          className="mt-8 w-full bg-strivo-accent hover:bg-strivo-accent/90 text-white
                      font-bold py-3.5 rounded-xl transition-colors cursor-pointer
                      disabled:opacity-50 disabled:cursor-not-allowed
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
         >
           Publish video
         </button>
@@ -270,7 +270,7 @@ function BackLink({ onClick }: { onClick?: () => void }) {
         onClick={onClick}
         className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm
                    transition-colors mb-6 cursor-pointer focus-visible:outline-none
-                   focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                   focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
              strokeWidth="2" aria-hidden>
@@ -285,7 +285,7 @@ function BackLink({ onClick }: { onClick?: () => void }) {
       href="/creators/dashboard"
       className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm
                  transition-colors mb-6 focus-visible:outline-none
-                 focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                 focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
     >
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
            strokeWidth="2" aria-hidden>

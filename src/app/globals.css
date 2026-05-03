@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --cinema-bg:      #0e0e0e;
-  --cinema-surface: #1a1a1a;
-  --cinema-accent:  #0915e6;
-  --cinema-text:    #ffffff;
-  --cinema-muted:   rgba(255, 255, 255, 0.7);
+  --strivo-bg:      #0e0e0e;
+  --strivo-surface: #1a1a1a;
+  --strivo-accent:  #0915e6;
+  --strivo-text:    #ffffff;
+  --strivo-muted:   rgba(255, 255, 255, 0.7);
 }
 
 html {

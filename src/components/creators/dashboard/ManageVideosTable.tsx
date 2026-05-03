@@ -40,7 +40,7 @@ export default function ManageVideosTable({ initialVideos }: Props) {
     return (
       <div className="text-center py-16 text-white/30 text-sm">
         No videos uploaded yet.{' '}
-        <Link href="/creators/dashboard/upload" className="text-cinema-accent hover:underline">
+        <Link href="/creators/dashboard/upload" className="text-strivo-accent hover:underline">
           Upload your first video
         </Link>
       </div>
@@ -69,7 +69,7 @@ export default function ManageVideosTable({ initialVideos }: Props) {
                   className={`group transition-colors hover:bg-white/[0.02] ${isDeleting ? 'opacity-50' : ''}`}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="relative aspect-video w-24 bg-cinema-surface rounded-lg overflow-hidden shrink-0">
+                    <div className="relative aspect-video w-24 bg-strivo-surface rounded-lg overflow-hidden shrink-0">
                       {video.thumbnail_url ? (
                         <Image src={video.thumbnail_url} alt="" fill sizes="96px" className="object-cover" />
                       ) : (
@@ -83,9 +83,9 @@ export default function ManageVideosTable({ initialVideos }: Props) {
                     </div>
                     <div className="min-w-0">
                       <Link href={`/watch/${video.id}`}
-                            className="text-white font-medium line-clamp-2 hover:text-cinema-accent
+                            className="text-white font-medium line-clamp-2 hover:text-strivo-accent
                                        transition-colors focus-visible:outline-none focus-visible:ring-2
-                                       focus-visible:ring-cinema-accent rounded">
+                                       focus-visible:ring-strivo-accent rounded">
                         {video.title}
                       </Link>
                       {video.tags.length > 0 && (
@@ -111,14 +111,14 @@ export default function ManageVideosTable({ initialVideos }: Props) {
                     <Link href={`/creators/dashboard/edit/${video.id}`}
                           className="text-white/50 hover:text-white text-xs px-2 py-1 rounded
                                      transition-colors focus-visible:outline-none focus-visible:ring-2
-                                     focus-visible:ring-cinema-accent">
+                                     focus-visible:ring-strivo-accent">
                       Edit
                     </Link>
                     <button onClick={() => deleteVideo(video.id)} disabled={isPending}
                             aria-label={`Delete ${video.title}`}
                             className="text-white/30 hover:text-red-400 text-xs px-2 py-1 rounded
                                        transition-colors cursor-pointer disabled:cursor-not-allowed
-                                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent">
+                                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent">
                       {isDeleting ? 'Deleting…' : 'Delete'}
                     </button>
                   </div>

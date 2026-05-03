@@ -5,11 +5,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cinema: {
+        strivo: {
           bg: '#0e0e0e',
           surface: '#1a1a1a',
-          accent: '#0915e6',
-          'accent-hover': '#0712c4',
+          accent: '#3b82f6',
+          'accent-hover': '#2563eb',
           border: 'rgba(255,255,255,0.06)',
         },
       },

@@ -1,5 +1,5 @@
 -- ============================================================
--- CINEMA — Full database schema + seed data
+-- Strivo Cell — Full database schema + seed data
 -- Run this in Supabase → SQL Editor
 -- ============================================================
 
@@ -7,6 +7,18 @@
 create extension if not exists "uuid-ossp";
 
 -- ── Tables ────────────────────────────────────────────────────
+
+create table if not exists public.profiles (
+  id               uuid primary key references auth.users(id) on delete cascade,
+  username         text unique,
+  bio              text,
+  avatar_url       text,
+  social_twitter   text,
+  social_youtube   text,
+  social_instagram text,
+  created_at       timestamptz default now(),
+  updated_at       timestamptz default now()
+);
 
 create table if not exists public.titles (
   id            uuid primary key default uuid_generate_v4(),
@@ -91,6 +103,7 @@ create index if not exists idx_party_rooms_active
 
 -- ── Row Level Security ────────────────────────────────────────
 
+alter table public.profiles      enable row level security;
 alter table public.titles        enable row level security;
 alter table public.seasons       enable row level security;
 alter table public.episodes      enable row level security;
@@ -100,10 +113,16 @@ alter table public.watch_progress enable row level security;
 alter table public.party_rooms   enable row level security;
 
 -- Public read
+create policy "Public read profiles"     on public.profiles     for select using (true);
 create policy "Public read titles"       on public.titles       for select using (true);
 create policy "Public read seasons"      on public.seasons      for select using (true);
 create policy "Public read episodes"     on public.episodes     for select using (true);
 create policy "Public read video_assets" on public.video_assets for select using (true);
+
+-- Profiles: owner manages
+create policy "Users manage profiles"
+  on public.profiles for all
+  using (auth.uid() = id) with check (auth.uid() = id);
 
 -- Watchlist: owner only
 create policy "Users manage watchlist"
@@ -153,8 +172,21 @@ values
 ('Pale House','A family restoring an abandoned Victorian estate gradually realises the house is not as empty as the estate agent promised.','series',ARRAY['Horror'],2022,null,false,'https://picsum.photos/seed/palehouse-back/1920/1080','https://picsum.photos/seed/palehouse-post/400/600','TV-MA',ARRAY['4K','HDR']),
 ('Below Tide','Marine archaeologists excavating a submerged Norse settlement awaken something that has been waiting eight centuries to resurface.','movie',ARRAY['Horror','Sci-Fi'],2023,111,false,'https://picsum.photos/seed/belowtide-back/1920/1080','https://picsum.photos/seed/belowtide-post/400/600','R',ARRAY['4K']);
 
--- Seed video_assets (one per title — storage_path is placeholder)
 insert into public.video_assets (title_id, storage_path, quality)
 select id, 'videos/' || lower(replace(title, ' ', '-')) || '/master.m3u8', '4K'
 from public.titles
 on conflict (title_id) do nothing;
+
+-- ── Storage ───────────────────────────────────────────────────
+insert into storage.buckets (id, name, public) 
+values ('avatars', 'avatars', true) 
+on conflict do nothing;
+
+create policy "Avatars are publicly accessible." 
+on storage.objects for select using (bucket_id = 'avatars');
+
+create policy "Users can upload avatars." 
+on storage.objects for insert with check (bucket_id = 'avatars' and auth.role() = 'authenticated');
+
+create policy "Users can update avatars." 
+on storage.objects for update with check (bucket_id = 'avatars' and auth.role() = 'authenticated');

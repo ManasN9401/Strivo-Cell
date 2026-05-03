@@ -23,10 +23,10 @@ export default function ChaptersList({ chapters, currentTime = 0, onSeek }: Prop
     currentTime >= ch.timestamp_seconds ? i : acc, 0)
 
   return (
-    <section aria-label="Video chapters" className="bg-cinema-surface rounded-xl overflow-hidden">
+    <section aria-label="Video chapters" className="bg-strivo-surface rounded-xl overflow-hidden">
       <button onClick={() => setExpanded(v => !v)}
               className="w-full flex items-center justify-between px-4 py-3 cursor-pointer
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent
                          hover:bg-white/5 transition-colors"
               aria-expanded={expanded}>
         <span className="text-white text-sm font-semibold">
@@ -48,12 +48,12 @@ export default function ChaptersList({ chapters, currentTime = 0, onSeek }: Prop
                         className={[
                           'w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer',
                           'transition-colors duration-150 hover:bg-white/5',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent',
-                          isActive ? 'bg-cinema-accent/10' : '',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent',
+                          isActive ? 'bg-strivo-accent/10' : '',
                         ].join(' ')}
                         aria-current={isActive ? 'true' : undefined}>
-                  <div className={`w-1 h-6 rounded-full shrink-0 transition-colors ${isActive ? 'bg-cinema-accent' : 'bg-transparent'}`} aria-hidden />
-                  <span className="text-cinema-accent font-mono text-xs shrink-0 w-10">
+                  <div className={`w-1 h-6 rounded-full shrink-0 transition-colors ${isActive ? 'bg-strivo-accent' : 'bg-transparent'}`} aria-hidden />
+                  <span className="text-strivo-accent font-mono text-xs shrink-0 w-10">
                     {formatTime(ch.timestamp_seconds)}
                   </span>
                   <span className={`text-sm truncate transition-colors ${isActive ? 'text-white font-medium' : 'text-white/60'}`}>

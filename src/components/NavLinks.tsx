@@ -54,7 +54,7 @@ export function NavLinks() {
                 className={[
                   'text-sm font-medium transition-colors duration-200 py-5 block',
                   'focus-visible:outline-none focus-visible:ring-2',
-                  'focus-visible:ring-cinema-accent rounded',
+                  'focus-visible:ring-strivo-accent rounded',
                   isActive ? 'text-white' : 'text-white/50 hover:text-white',
                 ].join(' ')}
               >
@@ -69,7 +69,7 @@ export function NavLinks() {
       {bar && (
         <div
           aria-hidden
-          className="absolute bottom-0 h-[2px] bg-cinema-accent rounded-full
+          className="absolute bottom-0 h-[2px] bg-strivo-accent rounded-full
                      transition-all duration-300 ease-out"
           style={{ left: bar.left, width: bar.width }}
         />

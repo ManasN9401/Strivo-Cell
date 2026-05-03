@@ -19,10 +19,10 @@ export default function Error({
         <div className="flex gap-3 justify-center">
           <button
             onClick={reset}
-            className="bg-cinema-accent hover:bg-cinema-accent-hover text-white
+            className="bg-strivo-accent hover:bg-strivo-accent-hover text-white
                        font-semibold px-5 py-2.5 rounded-lg text-sm
                        transition-colors cursor-pointer
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
           >
             Try again
           </button>
@@ -31,7 +31,7 @@ export default function Error({
             className="bg-white/10 hover:bg-white/20 text-white font-semibold
                        px-5 py-2.5 rounded-lg text-sm border border-white/10
                        transition-colors focus-visible:outline-none focus-visible:ring-2
-                       focus-visible:ring-cinema-accent"
+                       focus-visible:ring-strivo-accent"
           >
             Go home
           </Link>

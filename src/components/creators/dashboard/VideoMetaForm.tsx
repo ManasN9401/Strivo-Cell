@@ -53,9 +53,9 @@ export default function VideoMetaForm({ value, onChange }: Props) {
           placeholder="Give your video a title…"
           maxLength={100}
           required
-          className="w-full bg-cinema-bg border border-white/10 rounded-xl px-4 py-3
+          className="w-full bg-strivo-bg border border-white/10 rounded-xl px-4 py-3
                      text-white text-sm placeholder:text-white/25 outline-none
-                     focus:border-cinema-accent/50 transition-colors"
+                     focus:border-strivo-accent/50 transition-colors"
         />
         <p className="text-white/25 text-xs mt-1 text-right">{value.title.length}/100</p>
       </div>
@@ -72,9 +72,9 @@ export default function VideoMetaForm({ value, onChange }: Props) {
           placeholder="Tell viewers about your video…"
           maxLength={5000}
           rows={5}
-          className="w-full bg-cinema-bg border border-white/10 rounded-xl px-4 py-3
+          className="w-full bg-strivo-bg border border-white/10 rounded-xl px-4 py-3
                      text-white text-sm placeholder:text-white/25 outline-none resize-none
-                     focus:border-cinema-accent/50 transition-colors leading-relaxed"
+                     focus:border-strivo-accent/50 transition-colors leading-relaxed"
         />
         <p className="text-white/25 text-xs mt-1 text-right">{value.description.length}/5000</p>
       </div>
@@ -93,18 +93,18 @@ export default function VideoMetaForm({ value, onChange }: Props) {
             onKeyDown={e => (e.key === 'Enter' || e.key === ',') && (e.preventDefault(), addTag())}
             placeholder="Add a tag, press Enter"
             maxLength={30}
-            className="flex-1 bg-cinema-bg border border-white/10 rounded-xl px-4 py-3
+            className="flex-1 bg-strivo-bg border border-white/10 rounded-xl px-4 py-3
                        text-white text-sm placeholder:text-white/25 outline-none
-                       focus:border-cinema-accent/50 transition-colors"
+                       focus:border-strivo-accent/50 transition-colors"
           />
           <button
             type="button"
             onClick={addTag}
             disabled={!tagInput.trim() || value.tags.length >= 10}
-            className="px-4 py-3 bg-cinema-surface hover:bg-white/10 text-white/60
+            className="px-4 py-3 bg-strivo-surface hover:bg-white/10 text-white/60
                        hover:text-white rounded-xl text-sm transition-colors cursor-pointer
                        disabled:opacity-40 disabled:cursor-not-allowed
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
           >
             Add
           </button>
@@ -113,7 +113,7 @@ export default function VideoMetaForm({ value, onChange }: Props) {
           <div className="flex flex-wrap gap-2 mt-3" role="list" aria-label="Tags">
             {value.tags.map(tag => (
               <span key={tag} role="listitem"
-                    className="flex items-center gap-1.5 bg-cinema-surface border border-white/10
+                    className="flex items-center gap-1.5 bg-strivo-surface border border-white/10
                                text-white/70 text-xs px-3 py-1.5 rounded-full">
                 #{tag}
                 <button type="button" onClick={() => removeTag(tag)}
@@ -145,8 +145,8 @@ export default function VideoMetaForm({ value, onChange }: Props) {
                      className={[
                        'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-150',
                        checked
-                         ? 'border-cinema-accent bg-cinema-accent/10'
-                         : 'border-white/10 bg-cinema-surface hover:border-white/20',
+                         ? 'border-strivo-accent bg-strivo-accent/10'
+                         : 'border-white/10 bg-strivo-surface hover:border-white/20',
                      ].join(' ')}>
                 <input type="radio" name="visibility" value={opt.value} checked={checked}
                        onChange={() => update('visibility', opt.value)}

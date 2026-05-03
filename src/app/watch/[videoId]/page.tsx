@@ -67,7 +67,7 @@ function renderTitleWatchPage(
   progress: Awaited<ReturnType<typeof getProgress>> | null,
 ) {
   return (
-    <main className="bg-cinema-bg min-h-screen pt-20 pb-16">
+    <main className="bg-strivo-bg min-h-screen pt-20 pb-16">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 xl:grid-cols-[1.3fr,420px]">
           <div className="space-y-8">
@@ -100,7 +100,7 @@ function renderTitleWatchPage(
                 {(title.genre ?? []).map((genre) => (
                   <span
                     key={genre}
-                    className="text-[11px] font-bold uppercase tracking-widest text-cinema-accent border border-cinema-accent/40 px-2.5 py-1 rounded-full"
+                    className="text-[11px] font-bold uppercase tracking-widest text-strivo-accent border border-strivo-accent/40 px-2.5 py-1 rounded-full"
                   >
                     {genre}
                   </span>
@@ -110,7 +110,7 @@ function renderTitleWatchPage(
           </div>
 
           <aside className="space-y-6">
-            <div className="rounded-3xl bg-cinema-surface p-6 shadow-lg">
+            <div className="rounded-3xl bg-strivo-surface p-6 shadow-lg">
               <h2 className="text-white text-xl font-semibold mb-3">Up next</h2>
               <Suspense fallback={<RecommendedSkeleton />}>
                 <UpNext titles={related} currentId={title.id} />
@@ -134,7 +134,7 @@ function renderCreatorWatchPage(
   const channel = video.channel
 
   return (
-    <main className="bg-cinema-bg min-h-screen pt-20 pb-16">
+    <main className="bg-strivo-bg min-h-screen pt-20 pb-16">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
 
@@ -151,9 +151,9 @@ function renderCreatorWatchPage(
               {channel && (
                 <div className="flex items-center gap-3">
                   <a href={`/creators/channel/${channel.id}`}
-                     className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded-full"
+                     className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded-full"
                      aria-label={`${channel.name}'s channel`}>
-                    <div className="w-10 h-10 rounded-full bg-cinema-accent flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-strivo-accent flex items-center justify-center text-white text-sm font-bold overflow-hidden">
                       {channel.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={channel.avatar_url} alt={channel.name} className="w-full h-full object-cover" />
@@ -164,7 +164,7 @@ function renderCreatorWatchPage(
                   </a>
                   <div>
                     <a href={`/creators/channel/${channel.id}`}
-                       className="text-white text-sm font-semibold hover:text-white/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded">
+                       className="text-white text-sm font-semibold hover:text-white/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded">
                       {channel.name}
                     </a>
                     <p className="text-white/40 text-xs">
@@ -189,8 +189,8 @@ function renderCreatorWatchPage(
               </div>
             </div>
 
-            <details className="mt-4 bg-cinema-surface rounded-xl group">
-              <summary className="px-4 py-3 cursor-pointer text-white/60 text-sm hover:text-white transition-colors list-none flex items-center justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded-xl">
+            <details className="mt-4 bg-strivo-surface rounded-xl group">
+              <summary className="px-4 py-3 cursor-pointer text-white/60 text-sm hover:text-white transition-colors list-none flex items-center justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded-xl">
                 <span>
                   <span className="text-white font-medium">{formatCount(video.views)} views</span>
                   {' · '}
@@ -246,7 +246,7 @@ function SubscribeButton({ channelId }: { channelId: string }) {
     <button
       className="px-4 py-2 bg-white text-black text-xs font-bold rounded-full
                  hover:bg-white/90 transition-colors cursor-pointer min-h-[36px]
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
     >
       Subscribe
     </button>
@@ -256,10 +256,10 @@ function SubscribeButton({ channelId }: { channelId: string }) {
 function SaveButton({ videoId }: { videoId: string }) {
   return (
     <button
-      className="flex items-center gap-2 px-4 py-2 bg-cinema-surface text-white/70
+      className="flex items-center gap-2 px-4 py-2 bg-strivo-surface text-white/70
                  hover:text-white text-sm font-semibold rounded-full transition-colors
                  cursor-pointer min-h-[44px] focus-visible:outline-none
-                 focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                 focus-visible:ring-2 focus-visible:ring-strivo-accent"
       aria-label="Save to playlist"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -276,11 +276,11 @@ function RecommendedSkeleton() {
     <div className="space-y-3">
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="flex gap-3">
-          <div className="aspect-video w-40 bg-cinema-surface rounded-lg animate-pulse shrink-0" />
+          <div className="aspect-video w-40 bg-strivo-surface rounded-lg animate-pulse shrink-0" />
           <div className="flex-1 space-y-2 py-1">
-            <div className="h-3 bg-cinema-surface rounded animate-pulse" />
-            <div className="h-3 bg-cinema-surface rounded animate-pulse w-3/4" />
-            <div className="h-3 bg-cinema-surface rounded animate-pulse w-1/2" />
+            <div className="h-3 bg-strivo-surface rounded animate-pulse" />
+            <div className="h-3 bg-strivo-surface rounded animate-pulse w-3/4" />
+            <div className="h-3 bg-strivo-surface rounded animate-pulse w-1/2" />
           </div>
         </div>
       ))}

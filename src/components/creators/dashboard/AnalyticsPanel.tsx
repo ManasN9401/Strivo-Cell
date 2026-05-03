@@ -71,7 +71,7 @@ export default function AnalyticsPanel({ data }: Props) {
     <section aria-label="Video analytics" className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map(s => (
-          <div key={s.label} className="bg-cinema-surface rounded-xl px-5 py-4">
+          <div key={s.label} className="bg-strivo-surface rounded-xl px-5 py-4">
             <p className="text-white/40 text-xs font-medium uppercase tracking-wide">{s.label}</p>
             <p className="text-white text-2xl font-bold mt-1">{s.value}</p>
             <p className="text-white/30 text-xs mt-0.5">{s.sub}</p>
@@ -85,7 +85,7 @@ export default function AnalyticsPanel({ data }: Props) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-cinema-surface rounded-xl p-5">
+          <div className="bg-strivo-surface rounded-xl p-5">
             <p className="text-white/60 text-xs font-medium mb-3">Views — last 30 days</p>
             <Sparkline values={viewSeries} color="#0915e6" label="Daily views sparkline" />
             <div className="flex justify-between mt-2 text-white/25 text-xs">
@@ -93,7 +93,7 @@ export default function AnalyticsPanel({ data }: Props) {
               <span>{last30[last30.length - 1]?.date?.slice(5)}</span>
             </div>
           </div>
-          <div className="bg-cinema-surface rounded-xl p-5">
+          <div className="bg-strivo-surface rounded-xl p-5">
             <p className="text-white/60 text-xs font-medium mb-3">Watch time (min) — last 30 days</p>
             <Sparkline values={watchSeries} color="#22c55e" label="Daily watch time sparkline" />
             <div className="flex justify-between mt-2 text-white/25 text-xs">

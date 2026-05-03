@@ -365,6 +365,12 @@ export default function VideoPlayer({
         skip(-10)
         return
       }
+
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault()
+        toggleFs()
+        return
+      }
     }
 
     document.addEventListener('mousedown', onDocumentMouseDown)
@@ -493,7 +499,6 @@ export default function VideoPlayer({
   return (
     <div
       ref={containerRef}
-      onDoubleClick={toggleFs}
       className={`group relative bg-black overflow-hidden select-none ${
         isFullscreen ? 'fixed inset-0 z-[100]' : 'aspect-video rounded-xl w-full'
       }`}
@@ -508,7 +513,7 @@ export default function VideoPlayer({
 
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-cinema-accent animate-spin" />
+          <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-strivo-accent animate-spin" />
         </div>
       )}
 
@@ -519,16 +524,16 @@ export default function VideoPlayer({
       />
 
       <div
-        className={`absolute inset-0 flex flex-col justify-between
+        className={`absolute inset-0 flex flex-col justify-between pointer-events-none
         bg-gradient-to-t from-black/80 via-transparent to-black/30
         transition-opacity duration-300
-        ${controlsVisible || !isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        ${controlsVisible || !isPlaying ? 'opacity-100' : 'opacity-0'}`}
       >
-        <div className="px-5 pt-4">
+        <div className="px-5 pt-4 pointer-events-auto">
           <p className="text-white font-semibold text-sm drop-shadow">{titleName}</p>
         </div>
 
-        <div className="px-5 pb-5 space-y-3">
+        <div className="px-5 pb-5 space-y-3 pointer-events-auto">
           <div className="relative group/seek h-1 hover:h-1.5 transition-all duration-150">
             <div
               className="absolute inset-y-0 left-0 bg-white/20 rounded-full"
@@ -547,14 +552,14 @@ export default function VideoPlayer({
             />
 
             <div
-              className="absolute inset-y-0 left-0 bg-cinema-accent rounded-full"
+              className="absolute inset-y-0 left-0 bg-strivo-accent rounded-full"
               style={{ width: `${progress}%` }}
             />
 
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-cinema-accent
+              className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-strivo-accent
               rounded-full opacity-0 group-hover/seek:opacity-100 transition-opacity
-              shadow-lg shadow-cinema-accent/50 pointer-events-none"
+              shadow-lg shadow-strivo-accent/50 pointer-events-none"
               style={{ left: `calc(${progress}% - 7px)` }}
             />
           </div>
@@ -565,8 +570,8 @@ export default function VideoPlayer({
                 onClick={togglePlay}
                 aria-label={isPlaying ? 'Pause' : 'Play'}
                 className="w-9 h-9 flex items-center justify-center text-white
-                hover:text-cinema-accent transition-colors cursor-pointer
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded-full"
+                hover:text-strivo-accent transition-colors cursor-pointer
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded-full"
               >
                 {isPlaying ? (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
@@ -584,7 +589,7 @@ export default function VideoPlayer({
                 onClick={() => skip(-10)}
                 aria-label="Rewind 10 seconds"
                 className="text-white/70 hover:text-white transition-colors cursor-pointer
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
                   <path d="M10 3a7 7 0 1 0 6.06 3.5" strokeLinecap="round" />
@@ -597,7 +602,7 @@ export default function VideoPlayer({
                 onClick={() => skip(10)}
                 aria-label="Skip 10 seconds"
                 className="text-white/70 hover:text-white transition-colors cursor-pointer
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
                   <path d="M10 3a7 7 0 1 1-6.06 3.5" strokeLinecap="round" />
@@ -611,7 +616,7 @@ export default function VideoPlayer({
                   onClick={toggleMute}
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                   className="text-white/70 hover:text-white transition-colors cursor-pointer
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
                 >
                   {isMuted || volume === 0 ? (
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
@@ -636,7 +641,7 @@ export default function VideoPlayer({
                     value={isMuted ? 0 : volume}
                     onChange={changeVolume}
                     aria-label="Volume"
-                    className="w-20 accent-cinema-accent cursor-pointer"
+                    className="w-20 accent-strivo-accent cursor-pointer"
                   />
                 </div>
               </div>
@@ -658,7 +663,7 @@ export default function VideoPlayer({
                   className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white
                             transition-colors cursor-pointer
                             focus-visible:outline-none focus-visible:ring-2
-                            focus-visible:ring-cinema-accent rounded-full"
+                            focus-visible:ring-strivo-accent rounded-full"
                 >
                   <svg
                     width="19"
@@ -679,7 +684,7 @@ export default function VideoPlayer({
                 {showSettings && (
                   <div
                     className="absolute bottom-11 right-0 w-60 rounded-xl border border-white/10
-                              bg-cinema-surface/95 backdrop-blur-xl shadow-xl p-3 space-y-4 z-30"
+                              bg-strivo-surface/95 backdrop-blur-xl shadow-xl p-3 space-y-4 z-30"
                   >
                     <div>
                       <p className="text-xs font-semibold text-white/70 mb-2">Quality</p>
@@ -691,7 +696,7 @@ export default function VideoPlayer({
                             onClick={() => changeQuality(-1)}
                             className={`text-[11px] px-2 py-1 rounded border transition-colors ${
                               selectedLevel === -1
-                                ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                ? 'border-strivo-accent text-strivo-accent bg-strivo-accent/10'
                                 : 'border-white/10 text-white/60 hover:text-white'
                             }`}
                           >
@@ -705,7 +710,7 @@ export default function VideoPlayer({
                               onClick={() => changeQuality(level.index)}
                               className={`text-[11px] px-2 py-1 rounded border transition-colors ${
                                 selectedLevel === level.index
-                                  ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                  ? 'border-strivo-accent text-strivo-accent bg-strivo-accent/10'
                                   : 'border-white/10 text-white/60 hover:text-white'
                               }`}
                             >
@@ -731,7 +736,7 @@ export default function VideoPlayer({
                             onClick={() => changePlaybackRate(rate)}
                             className={`text-[11px] px-2 py-1 rounded border transition-colors ${
                               playbackRate === rate
-                                ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                ? 'border-strivo-accent text-strivo-accent bg-strivo-accent/10'
                                 : 'border-white/10 text-white/60 hover:text-white'
                             }`}
                           >
@@ -751,7 +756,7 @@ export default function VideoPlayer({
                             onClick={disableSubtitles}
                             className={`text-[11px] px-2 py-1 rounded border transition-colors ${
                               selectedSubtitle === -1
-                                ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                ? 'border-strivo-accent text-strivo-accent bg-strivo-accent/10'
                                 : 'border-white/10 text-white/60 hover:text-white'
                             }`}
                           >
@@ -765,7 +770,7 @@ export default function VideoPlayer({
                               onClick={() => changeSubtitleTrack(track.index)}
                               className={`text-[11px] px-2 py-1 rounded border transition-colors ${
                                 selectedSubtitle === track.index
-                                  ? 'border-cinema-accent text-cinema-accent bg-cinema-accent/10'
+                                  ? 'border-strivo-accent text-strivo-accent bg-strivo-accent/10'
                                   : 'border-white/10 text-white/60 hover:text-white'
                               }`}
                             >
@@ -790,7 +795,7 @@ export default function VideoPlayer({
                 className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white
                           transition-colors cursor-pointer
                           focus-visible:outline-none focus-visible:ring-2
-                          focus-visible:ring-cinema-accent rounded-full"
+                          focus-visible:ring-strivo-accent rounded-full"
               >
                 {isFullscreen ? (
                   <svg

@@ -32,7 +32,7 @@ export default async function DashboardPage({ searchParams }: Props) {
   ]
 
   return (
-    <main className="bg-cinema-bg min-h-screen pt-24 pb-20">
+    <main className="bg-strivo-bg min-h-screen pt-24 pb-20">
       <div className="max-w-content mx-auto px-6 sm:px-8">
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -45,7 +45,7 @@ export default async function DashboardPage({ searchParams }: Props) {
 
           <Link
             href="/creators/dashboard/upload"
-            className="inline-flex items-center gap-2 bg-cinema-accent hover:bg-cinema-accent/90 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+            className="inline-flex items-center gap-2 bg-strivo-accent hover:bg-strivo-accent/90 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -64,8 +64,8 @@ export default async function DashboardPage({ searchParams }: Props) {
               role="tab"
               aria-selected={tab === t.id}
               className={tab === t.id
-                ? 'px-4 py-3 text-sm font-medium text-white border-b-2 border-cinema-accent -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded-t'
-                : 'px-4 py-3 text-sm font-medium text-white/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded-t'
+                ? 'px-4 py-3 text-sm font-medium text-white border-b-2 border-strivo-accent -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded-t'
+                : 'px-4 py-3 text-sm font-medium text-white/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded-t'
               }
             >
               {t.label}

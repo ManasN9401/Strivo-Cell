@@ -65,11 +65,11 @@ export default function ContentRow({
     <button
       onClick={() => scroll(dir)}
       aria-label={`Scroll ${dir}`}
-      className="w-9 h-9 rounded-full bg-black/70 hover:bg-cinema-accent
-                 border border-white/20 hover:border-cinema-accent
+      className="w-9 h-9 rounded-full bg-black/70 hover:bg-strivo-accent
+                 border border-white/20 hover:border-strivo-accent
                  text-white flex items-center justify-center
                  transition-colors duration-150 cursor-pointer
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
     >
       <svg
         width="16"
@@ -97,9 +97,9 @@ export default function ContentRow({
         {browseHref && (
           <Link
             href={browseHref}
-            className="text-xs font-medium text-cinema-accent hover:underline
+            className="text-xs font-medium text-blue-400 hover:underline
                        opacity-0 group-hover/row:opacity-100 transition-opacity
-                       focus-visible:opacity-100 focus-visible:outline-none"
+                       focus-visible:opacity-100 focus-visible:outline-none drop-shadow-[0_0_4px_rgba(34,211,238,0.3)]"
           >
             See all →
           </Link>
@@ -109,13 +109,12 @@ export default function ContentRow({
       <div className="relative">
         <div
           className={`absolute left-0 top-0 bottom-4 w-20 z-10 pointer-events-none
-                      bg-gradient-to-r from-cinema-bg to-transparent
+                      bg-gradient-to-r from-strivo-bg to-transparent
                       flex items-center justify-start pl-2 transition-opacity duration-200
-                      ${
-                        canLeft
-                          ? 'opacity-100 pointer-events-auto'
-                          : 'opacity-0 pointer-events-none'
-                      }`}
+                      ${canLeft
+              ? 'opacity-100 pointer-events-auto'
+              : 'opacity-0 pointer-events-none'
+            }`}
         >
           <ArrowBtn dir="left" />
         </div>
@@ -141,13 +140,12 @@ export default function ContentRow({
 
         <div
           className={`absolute right-0 top-0 bottom-4 w-20 z-10
-                      bg-gradient-to-l from-cinema-bg to-transparent
+                      bg-gradient-to-l from-strivo-bg to-transparent
                       flex items-center justify-end pr-2 transition-opacity duration-200
-                      ${
-                        canRight
-                          ? 'opacity-100 pointer-events-auto'
-                          : 'opacity-0 pointer-events-none'
-                      }`}
+                      ${canRight
+              ? 'opacity-100 pointer-events-auto'
+              : 'opacity-0 pointer-events-none'
+            }`}
         >
           <ArrowBtn dir="right" />
         </div>

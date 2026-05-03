@@ -50,7 +50,7 @@ export default function MovieCard({
                  hover:scale-105 hover:z-10 focus-within:scale-105 focus-within:z-10"
     >
       {/* Poster */}
-      <div className="relative aspect-[2/3] bg-cinema-surface">
+      <div className="relative aspect-[2/3] bg-strivo-surface">
         {title.poster_path ? (
           <Image
             src={title.poster_path}
@@ -145,7 +145,7 @@ export default function MovieCard({
               className="flex items-center gap-1 bg-white/10 hover:bg-white/20
                          text-white text-[10px] font-semibold px-2 py-1.5 rounded-md
                          transition-colors disabled:opacity-50 cursor-pointer
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
             >
               <span aria-hidden>{isInList ? '✓' : '+'}</span>
               {isInList ? 'Saved' : 'My List'}
@@ -153,10 +153,10 @@ export default function MovieCard({
 
             <Link
               href={`/party/new?title=${title.id}`}
-              className="flex items-center gap-1 bg-cinema-accent/20 hover:bg-cinema-accent/40
-                         text-cinema-accent text-[10px] font-semibold px-2 py-1.5 rounded-md
+              className="flex items-center gap-1 bg-strivo-accent/20 hover:bg-strivo-accent/40
+                         text-strivo-accent text-[10px] font-semibold px-2 py-1.5 rounded-md
                          transition-colors focus-visible:outline-none focus-visible:ring-2
-                         focus-visible:ring-cinema-accent"
+                         focus-visible:ring-strivo-accent"
             >
               ◈ Party
             </Link>
@@ -167,8 +167,8 @@ export default function MovieCard({
       {/* Card footer */}
       <Link
         href={`/titles/${title.id}`}
-        className="block bg-cinema-surface px-2.5 py-2 focus-visible:outline-none
-                   focus-visible:ring-2 focus-visible:ring-cinema-accent"
+        className="block bg-strivo-surface px-2.5 py-2 focus-visible:outline-none
+                   focus-visible:ring-2 focus-visible:ring-strivo-accent"
       >
         <p className="text-white text-xs font-semibold truncate">{title.title}</p>
         <p className="text-white/40 text-[10px] mt-0.5">

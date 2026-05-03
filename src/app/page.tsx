@@ -14,12 +14,12 @@ import {
 function RowSkeleton() {
   return (
     <section className="py-4 max-w-content mx-auto px-8">
-      <div className="h-6 w-40 bg-cinema-surface rounded animate-pulse mb-4" />
+      <div className="h-6 w-40 bg-strivo-surface rounded animate-pulse mb-4" />
       <div className="flex gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="flex-shrink-0 w-[200px] aspect-[2/3] bg-cinema-surface rounded-lg animate-pulse"
+            className="flex-shrink-0 w-[200px] aspect-[2/3] bg-strivo-surface rounded-lg animate-pulse"
             style={{ animationDelay: `${i * 60}ms` }}
           />
         ))}
@@ -52,7 +52,7 @@ async function HomeRows() {
   ])
 
   const rows = [
-    { heading: 'New on CINEMA', titles: newTitles, genre: null },
+    { heading: 'New on Strivo Cell', titles: newTitles, genre: null },
     { heading: 'Action', titles: action, genre: 'Action' },
     { heading: 'Science Fiction', titles: scifi, genre: 'Sci-Fi' },
     { heading: 'Drama', titles: drama, genre: 'Drama' },
@@ -83,8 +83,8 @@ async function HomeRows() {
 export default function HomePage() {
   return (
     <>
-      <main className="bg-cinema-bg min-h-screen">
-        <Suspense fallback={<div className="h-[88vh] bg-cinema-surface/20 animate-pulse" />}>
+      <main className="bg-strivo-bg min-h-screen">
+        <Suspense fallback={<div className="h-[88vh] bg-strivo-surface/20 animate-pulse" />}>
           <HeroBanner />
         </Suspense>
 

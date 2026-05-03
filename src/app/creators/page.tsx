@@ -10,7 +10,7 @@ async function FeedContent() {
 
 export default function CreatorsPage() {
   return (
-    <main className="bg-cinema-bg min-h-screen pt-24 pb-20">
+    <main className="bg-strivo-bg min-h-screen pt-24 pb-20">
       <div className="max-w-content mx-auto px-6 sm:px-8">
 
         <div className="mb-8 flex items-center justify-between">
@@ -21,10 +21,10 @@ export default function CreatorsPage() {
 
           <Link
             href="/creators/dashboard/upload"
-            className="flex items-center gap-2 bg-cinema-accent hover:bg-cinema-accent/90
+            className="flex items-center gap-2 bg-strivo-accent hover:bg-strivo-accent/90
                        text-white text-sm font-semibold px-4 py-2 rounded-lg
                        transition-colors duration-150 focus-visible:outline-none
-                       focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                       focus-visible:ring-2 focus-visible:ring-strivo-accent"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  strokeWidth="2.5" aria-hidden>
@@ -41,11 +41,11 @@ export default function CreatorsPage() {
               key={cat}
               className={[
                 'shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent',
                 'cursor-pointer',
                 i === 0
                   ? 'bg-white text-black'
-                  : 'bg-cinema-surface text-white/60 hover:text-white hover:bg-white/10',
+                  : 'bg-strivo-surface text-white/60 hover:text-white hover:bg-white/10',
               ].join(' ')}
             >
               {cat}

@@ -38,7 +38,7 @@ export default async function PartyRoomPage({ params }: Props) {
     <>
       <TopNavBar />
 
-      <main className="bg-cinema-bg min-h-screen pt-16">
+      <main className="bg-strivo-bg min-h-screen pt-16">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 py-8">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>

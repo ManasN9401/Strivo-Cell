@@ -14,7 +14,7 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: { default: 'CINEMA', template: '%s | CINEMA' },
+  title: { default: 'Strivo Cell', template: '%s | Strivo Cell' },
   description: 'Stream premium content. Anytime.',
   icons: { icon: '/favicon.ico' },
 }
@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang="en" className={manrope.variable}>
-      <body className="bg-cinema-bg text-white font-sans antialiased min-h-screen">
+      <body className="bg-strivo-bg text-white font-sans antialiased min-h-screen">
         <NavigationProgressWrapper />
         <TopNavBar />
         {children}

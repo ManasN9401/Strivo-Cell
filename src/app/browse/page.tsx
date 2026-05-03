@@ -42,7 +42,7 @@ export default async function BrowsePage({ searchParams }: Props) {
 
   return (
     <>
-      <main className="bg-cinema-bg min-h-screen pt-20">
+      <main className="bg-strivo-bg min-h-screen pt-20">
         <div className="max-w-content mx-auto px-8 py-8">
           <h1 className="text-4xl font-black tracking-tight mb-2">Browse</h1>
           {genre && (
@@ -55,12 +55,12 @@ export default async function BrowsePage({ searchParams }: Props) {
         <Suspense
           fallback={
             <div className="max-w-content mx-auto px-8">
-              <div className="h-6 w-32 bg-cinema-surface rounded animate-pulse mb-6" />
+              <div className="h-6 w-32 bg-strivo-surface rounded animate-pulse mb-6" />
               <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-3">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div
                     key={i}
-                    className="aspect-[2/3] bg-cinema-surface rounded-lg animate-pulse"
+                    className="aspect-[2/3] bg-strivo-surface rounded-lg animate-pulse"
                     style={{ animationDelay: `${i * 40}ms` }}
                   />
                 ))}

@@ -14,10 +14,10 @@ export default function CopyLinkButton({ roomId }: { roomId: string }) {
   return (
     <button
       onClick={copy}
-      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cinema-surface
+      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-strivo-surface
                  hover:bg-white/10 border border-white/10 text-white text-sm font-semibold
                  transition-colors cursor-pointer
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
     >
       <svg
         width="14"

@@ -66,10 +66,10 @@ export default function LikeDislikeBar({ videoId, initial }: Props) {
           className={[
             'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold',
             'transition-all duration-150 cursor-pointer min-h-[44px]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent',
             state.liked
-              ? 'bg-cinema-accent text-white shadow-[0_0_12px_rgba(9,21,230,0.35)]'
-              : 'bg-cinema-surface text-white/70 hover:text-white hover:bg-white/10',
+              ? 'bg-strivo-accent text-white shadow-[0_0_12px_rgba(9,21,230,0.35)]'
+              : 'bg-strivo-surface text-white/70 hover:text-white hover:bg-white/10',
           ].join(' ')}
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -90,10 +90,10 @@ export default function LikeDislikeBar({ videoId, initial }: Props) {
           className={[
             'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold',
             'transition-all duration-150 cursor-pointer min-h-[44px]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent',
             state.disliked
               ? 'bg-red-600/80 text-white'
-              : 'bg-cinema-surface text-white/70 hover:text-white hover:bg-white/10',
+              : 'bg-strivo-surface text-white/70 hover:text-white hover:bg-white/10',
           ].join(' ')}
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -109,7 +109,7 @@ export default function LikeDislikeBar({ videoId, initial }: Props) {
         <div className="h-1 bg-white/10 rounded-full overflow-hidden"
              role="meter" aria-label={`${Math.round(likeRatio * 100)}% positive`}
              aria-valuenow={Math.round(likeRatio * 100)} aria-valuemin={0} aria-valuemax={100}>
-          <div className="h-full bg-cinema-accent rounded-full transition-all duration-300"
+          <div className="h-full bg-strivo-accent rounded-full transition-all duration-300"
                style={{ width: `${likeRatio * 100}%` }} />
         </div>
       )}

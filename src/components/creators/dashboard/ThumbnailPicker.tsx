@@ -35,7 +35,7 @@ export default function ThumbnailPicker({ value, onChange }: Props) {
       </p>
       <div className="flex flex-col sm:flex-row gap-4" role="group" aria-labelledby="thumbnail-label">
         {/* Preview */}
-        <div className="relative aspect-video w-full sm:w-56 bg-cinema-surface rounded-xl
+        <div className="relative aspect-video w-full sm:w-56 bg-strivo-surface rounded-xl
                         overflow-hidden border border-white/10 shrink-0">
           {previewUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -60,10 +60,10 @@ export default function ThumbnailPicker({ value, onChange }: Props) {
         {/* Controls */}
         <div className="flex flex-col gap-3 justify-center">
           <button type="button" onClick={() => inputRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-cinema-surface hover:bg-white/10
+                  className="flex items-center gap-2 px-4 py-2.5 bg-strivo-surface hover:bg-white/10
                              border border-white/10 text-white/70 hover:text-white text-sm font-medium
                              rounded-lg transition-colors cursor-pointer
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent">
+                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  strokeWidth="2" aria-hidden>
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -74,10 +74,10 @@ export default function ThumbnailPicker({ value, onChange }: Props) {
           </button>
 
           <button type="button" onClick={autoGenerate} disabled={generating}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-cinema-surface hover:bg-white/10
+                  className="flex items-center gap-2 px-4 py-2.5 bg-strivo-surface hover:bg-white/10
                              border border-white/10 text-white/70 hover:text-white text-sm font-medium
                              rounded-lg transition-colors cursor-pointer disabled:opacity-50
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent">
+                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent">
             {generating ? (
               <>
                 <svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24"
@@ -102,7 +102,7 @@ export default function ThumbnailPicker({ value, onChange }: Props) {
           {value && (
             <button type="button" onClick={() => onChange(null)}
                     className="text-white/30 hover:text-red-400 text-xs transition-colors cursor-pointer
-                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded">
+                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded">
               Remove thumbnail
             </button>
           )}

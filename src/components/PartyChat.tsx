@@ -198,7 +198,7 @@ export default function PartyChat({
   // ─── Chat panel ───────────────────────────────────────────────────────────
   const ChatPanel = (
     <div className={[
-      'flex flex-col bg-cinema-surface border border-white/[0.06] rounded-xl overflow-hidden',
+      'flex flex-col bg-strivo-surface border border-white/[0.06] rounded-xl overflow-hidden',
       isFullscreen
         ? 'fixed bottom-20 right-4 w-72 h-96 z-[110] shadow-2xl animate-scale-in'
         : 'h-full min-h-0',
@@ -215,7 +215,7 @@ export default function PartyChat({
             onClick={() => setChatOpen(false)}
             aria-label="Close chat"
             className="text-white/40 hover:text-white transition-colors cursor-pointer
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
                  stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -289,7 +289,7 @@ export default function PartyChat({
                   className={[
                     'px-3 py-1.5 rounded-2xl text-sm leading-snug break-words',
                     isSelf
-                      ? 'bg-cinema-accent text-white rounded-tr-sm'
+                      ? 'bg-strivo-accent text-white rounded-tr-sm'
                       : 'bg-white/10 text-white rounded-tl-sm',
                   ].join(' ')}
                 >
@@ -317,7 +317,7 @@ export default function PartyChat({
             aria-label={`Send ${emoji}`}
             className="text-lg hover:scale-125 active:scale-95 transition-transform
                        cursor-pointer focus-visible:outline-none rounded
-                       focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                       focus-visible:ring-2 focus-visible:ring-strivo-accent"
           >
             {emoji}
           </button>
@@ -337,17 +337,17 @@ export default function PartyChat({
           aria-label="Chat message"
           className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2
                      text-white placeholder:text-white/20 text-sm outline-none
-                     focus:border-cinema-accent focus:ring-1 focus:ring-cinema-accent/30
+                     focus:border-strivo-accent focus:ring-1 focus:ring-strivo-accent/30
                      transition-colors duration-150"
         />
         <button
           onClick={sendMessage}
           disabled={!input.trim()}
           aria-label="Send message"
-          className="w-9 h-9 rounded-lg bg-cinema-accent hover:bg-cinema-accent-hover
+          className="w-9 h-9 rounded-lg bg-strivo-accent hover:bg-strivo-accent-hover
                      disabled:opacity-30 disabled:cursor-not-allowed
                      flex items-center justify-center transition-colors cursor-pointer
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent
                      shrink-0"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
@@ -365,10 +365,10 @@ export default function PartyChat({
       onClick={openChat}
       aria-label={`Open chat${unread > 0 ? ` (${unread} unread)` : ''}`}
       className="fixed bottom-20 right-4 z-[110] w-11 h-11 rounded-full
-                 bg-cinema-surface border border-white/10 shadow-xl
+                 bg-strivo-surface border border-white/10 shadow-xl
                  flex items-center justify-center
                  hover:bg-white/10 transition-colors cursor-pointer
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent
                  animate-scale-in"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
@@ -376,7 +376,7 @@ export default function PartyChat({
         <path d="M15 2H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3l3 3 3-3h3a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/>
       </svg>
       {unread > 0 && (
-        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-cinema-accent
+        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-strivo-accent
                          text-white text-[9px] font-bold flex items-center justify-center">
           {unread > 9 ? '9+' : unread}
         </span>

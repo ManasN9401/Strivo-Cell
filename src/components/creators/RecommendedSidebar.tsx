@@ -30,8 +30,8 @@ export default function RecommendedSidebar({ videos, currentVideoId }: Props) {
           <Link key={video.id} href={`/watch/${video.id}`}
                 className="group flex gap-3 rounded-lg hover:bg-white/5 p-1.5 -mx-1.5
                            transition-colors duration-150 focus-visible:outline-none
-                           focus-visible:ring-2 focus-visible:ring-cinema-accent">
-            <div className="relative aspect-video w-40 shrink-0 bg-cinema-surface rounded-lg overflow-hidden">
+                           focus-visible:ring-2 focus-visible:ring-strivo-accent">
+            <div className="relative aspect-video w-40 shrink-0 bg-strivo-surface rounded-lg overflow-hidden">
               {video.thumbnail_url ? (
                 <Image src={video.thumbnail_url} alt="" fill sizes="160px"
                        className="object-cover group-hover:scale-[1.03] transition-transform duration-300" />

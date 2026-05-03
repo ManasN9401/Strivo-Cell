@@ -22,7 +22,7 @@ function timeAgo(iso: string): string {
 
 function Avatar({ email }: { email?: string }) {
   return (
-    <div className="w-8 h-8 rounded-full bg-cinema-accent flex items-center justify-center
+    <div className="w-8 h-8 rounded-full bg-strivo-accent flex items-center justify-center
                     text-white text-xs font-bold shrink-0">
       {email?.[0]?.toUpperCase() ?? '?'}
     </div>
@@ -66,7 +66,7 @@ function CommentItem({ comment, currentUserId, onDelete, onReply, depth = 0 }: {
             {depth === 0 && currentUserId && (
               <button onClick={() => setShowReply(v => !v)}
                       className="text-white/40 hover:text-white text-xs transition-colors cursor-pointer
-                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded">
+                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded">
                 Reply
               </button>
             )}
@@ -74,7 +74,7 @@ function CommentItem({ comment, currentUserId, onDelete, onReply, depth = 0 }: {
               <button onClick={() => onDelete(comment.id)}
                       className="text-white/20 hover:text-red-400 text-xs transition-colors cursor-pointer
                                  opacity-0 group-hover:opacity-100 focus-visible:opacity-100
-                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent rounded"
+                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent rounded"
                       aria-label="Delete comment">
                 Delete
               </button>
@@ -85,14 +85,14 @@ function CommentItem({ comment, currentUserId, onDelete, onReply, depth = 0 }: {
               <input type="text" value={replyBody} onChange={e => setReplyBody(e.target.value)}
                      onKeyDown={e => e.key === 'Enter' && submitReply()}
                      placeholder="Write a reply…" maxLength={1000}
-                     className="flex-1 bg-cinema-surface border border-white/10 rounded-lg
+                     className="flex-1 bg-strivo-surface border border-white/10 rounded-lg
                                 px-3 py-2 text-white text-sm placeholder:text-white/30
-                                outline-none focus:border-cinema-accent/50 transition-colors"
+                                outline-none focus:border-strivo-accent/50 transition-colors"
                      aria-label="Reply text" />
               <button onClick={submitReply} disabled={isPending || !replyBody.trim()}
-                      className="px-3 py-2 bg-cinema-accent text-white text-xs font-semibold
+                      className="px-3 py-2 bg-strivo-accent text-white text-xs font-semibold
                                  rounded-lg transition-colors cursor-pointer disabled:opacity-50
-                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent">
+                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent">
                 Reply
               </button>
             </div>
@@ -165,7 +165,7 @@ export default function CommentsSection({ videoId, initialComments, currentUserI
             <input type="text" value={body} onChange={e => setBody(e.target.value)}
                    onKeyDown={e => e.key === 'Enter' && postComment()}
                    placeholder="Add a comment…" maxLength={2000}
-                   className="w-full bg-transparent border-b border-white/10 focus:border-cinema-accent/60
+                   className="w-full bg-transparent border-b border-white/10 focus:border-strivo-accent/60
                               text-white text-sm placeholder:text-white/30 outline-none pb-2 transition-colors"
                    aria-label="New comment" />
             {body.trim() && (
@@ -176,9 +176,9 @@ export default function CommentsSection({ videoId, initialComments, currentUserI
                   Cancel
                 </button>
                 <button onClick={postComment} disabled={isPending}
-                        className="bg-cinema-accent text-white text-xs font-semibold px-4 py-1.5
+                        className="bg-strivo-accent text-white text-xs font-semibold px-4 py-1.5
                                    rounded-full transition-colors cursor-pointer disabled:opacity-50
-                                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent">
+                                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent">
                   Comment
                 </button>
               </div>
@@ -187,7 +187,7 @@ export default function CommentsSection({ videoId, initialComments, currentUserI
         </div>
       ) : (
         <p className="text-white/40 text-sm mb-6">
-          <a href="/login" className="text-cinema-accent hover:underline">Sign in</a> to comment
+          <a href="/login" className="text-strivo-accent hover:underline">Sign in</a> to comment
         </p>
       )}
       <div className="space-y-6">

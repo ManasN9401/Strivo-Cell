@@ -78,7 +78,7 @@ export default function NavigationProgress() {
       className="fixed top-0 left-0 right-0 z-[200] h-[2px] pointer-events-none"
     >
       <div
-        className="h-full bg-cinema-accent shadow-[0_0_8px_#0915e6]"
+        className="h-full bg-strivo-accent shadow-[0_0_8px_#0915e6]"
         style={{
           width:      `${width}%`,
           transition: leaving

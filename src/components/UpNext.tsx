@@ -15,10 +15,10 @@ export default function UpNext({ titles, currentId }: { titles: Title[]; current
             <Link
               href={`/watch/${t.id}`}
               className="flex gap-3 group/up rounded-lg p-2 -mx-2
-                         hover:bg-cinema-surface transition-colors duration-150
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent"
+                         hover:bg-strivo-surface transition-colors duration-150
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent"
             >
-              <div className="relative w-28 aspect-video flex-shrink-0 rounded-md overflow-hidden bg-cinema-surface">
+              <div className="relative w-28 aspect-video flex-shrink-0 rounded-md overflow-hidden bg-strivo-surface">
                 {t.poster_path && (
                   <Image src={t.poster_path} alt="" fill className="object-cover" sizes="112px"/>
                 )}
@@ -31,7 +31,7 @@ export default function UpNext({ titles, currentId }: { titles: Title[]; current
               </div>
               <div className="flex-1 min-w-0 py-0.5">
                 <p className="text-white text-sm font-semibold truncate
-                              group-hover/up:text-cinema-accent transition-colors">{t.title}</p>
+                              group-hover/up:text-strivo-accent transition-colors">{t.title}</p>
                 <p className="text-white/40 text-xs mt-0.5">
                   {t.release_year} · {t.genre[0]}
                   {t.duration_mins && ` · ${Math.floor(t.duration_mins/60)}h ${t.duration_mins%60}m`}

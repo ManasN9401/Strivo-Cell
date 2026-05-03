@@ -16,11 +16,11 @@ export default async function SignupPage({ searchParams }: Props) {
 
   if (success === 'check-email') {
     return (
-      <main className="min-h-screen bg-cinema-bg flex items-center justify-center px-4">
+      <main className="min-h-screen bg-strivo-bg flex items-center justify-center px-4">
         <div className="w-full max-w-sm text-center animate-fade-up">
-          <p className="text-2xl font-black tracking-tighter text-cinema-accent mb-8">CINEMA</p>
-          <div className="bg-cinema-surface rounded-2xl p-8 border border-white/[0.06]">
-            <div className="w-14 h-14 bg-cinema-accent/10 rounded-full flex items-center justify-center mx-auto mb-5 text-cinema-accent text-2xl">
+          <p className="text-2xl font-black tracking-tighter mb-8 bg-gradient-to-r from-blue-500 via-cyan-400 to-white text-transparent bg-clip-text drop-shadow-[0_0_8px_rgba(34,211,238,0.3)]">STRIVO</p>
+          <div className="bg-strivo-surface rounded-2xl p-8 border border-white/[0.06]">
+            <div className="w-14 h-14 bg-strivo-accent/10 rounded-full flex items-center justify-center mx-auto mb-5 text-strivo-accent text-2xl">
               ✓
             </div>
             <h1 className="text-xl font-bold mb-2">Check your email</h1>
@@ -34,17 +34,17 @@ export default async function SignupPage({ searchParams }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-cinema-bg flex items-center justify-center px-4">
+    <main className="min-h-screen bg-strivo-bg flex items-center justify-center px-4">
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-64 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-cinema-accent opacity-[0.07] blur-[120px]" />
+        <div className="absolute -top-64 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-strivo-accent opacity-[0.07] blur-[120px]" />
       </div>
 
       <div className="relative w-full max-w-sm animate-scale-in">
-        <p className="text-center text-2xl font-black tracking-tighter text-cinema-accent mb-10">
-          CINEMA
+        <p className="text-center text-2xl font-black tracking-tighter mb-10 bg-gradient-to-r from-blue-500 via-cyan-400 to-white text-transparent bg-clip-text drop-shadow-[0_0_8px_rgba(34,211,238,0.3)]">
+          STRIVO
         </p>
 
-        <div className="bg-cinema-surface rounded-2xl p-8 border border-white/[0.06]">
+        <div className="bg-strivo-surface rounded-2xl p-8 border border-white/[0.06]">
           <h1 className="text-2xl font-bold tracking-tight mb-1">Create account</h1>
           <p className="text-white/50 text-sm mb-8">Start watching today</p>
 
@@ -69,7 +69,7 @@ export default async function SignupPage({ searchParams }: Props) {
                 autoComplete="email"
                 required
                 placeholder="you@example.com"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-cinema-accent focus:ring-2 focus:ring-cinema-accent/20 transition-colors duration-200"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-strivo-accent focus:ring-2 focus:ring-strivo-accent/20 transition-colors duration-200"
               />
             </div>
 
@@ -85,13 +85,13 @@ export default async function SignupPage({ searchParams }: Props) {
                 required
                 minLength={8}
                 placeholder="Min. 8 characters"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-cinema-accent focus:ring-2 focus:ring-cinema-accent/20 transition-colors duration-200"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-strivo-accent focus:ring-2 focus:ring-strivo-accent/20 transition-colors duration-200"
               />
             </div>
 
             <SubmitButton
               pendingLabel="Creating account…"
-              className="w-full bg-cinema-accent hover:bg-cinema-accent-hover text-white font-semibold rounded-lg py-3 text-sm transition-colors duration-200 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinema-accent focus-visible:ring-offset-2 focus-visible:ring-offset-cinema-surface"
+              className="w-full bg-strivo-accent hover:bg-strivo-accent-hover text-white font-semibold rounded-lg py-3 text-sm transition-colors duration-200 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-strivo-accent focus-visible:ring-offset-2 focus-visible:ring-offset-strivo-surface"
             >
               Create account
             </SubmitButton>
@@ -99,7 +99,7 @@ export default async function SignupPage({ searchParams }: Props) {
 
           <p className="mt-6 text-center text-sm text-white/40">
             Already a member?{' '}
-            <Link href="/login" className="text-cinema-accent hover:underline font-medium">
+            <Link href="/login" className="text-strivo-accent hover:underline font-medium">
               Sign in
             </Link>
           </p>
