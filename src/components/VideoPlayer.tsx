@@ -30,12 +30,14 @@ function fmtTime(s: number) {
 
 interface Props {
   titleId: string
+  episodeId?: string
   titleName: string
   initialProgressSecs?: number
 }
 
 export default function VideoPlayer({
   titleId,
+  episodeId,
   titleName,
   initialProgressSecs = 0,
 }: Props) {
@@ -114,9 +116,12 @@ export default function VideoPlayer({
         const functionUrl = `${supabaseUrl}/functions/v1/get-signed-url/`
         const authHeader = `Bearer ${session.access_token}`
 
-        const sourceUrl = `${functionUrl}?title_id=${encodeURIComponent(
+        let sourceUrl = `${functionUrl}?title_id=${encodeURIComponent(
           titleId
         )}&quality=720p`
+        if (episodeId) {
+          sourceUrl += `&episode_id=${encodeURIComponent(episodeId)}`
+        }
 
         const seekToInitialProgress = () => {
           if (initialProgressSecs > 0) {
@@ -218,7 +223,7 @@ export default function VideoPlayer({
         video.load()
       }
     }
-  }, [titleId, initialProgressSecs])
+  }, [titleId, initialProgressSecs, episodeId])
 
   useEffect(() => {
     const video = videoRef.current
@@ -273,8 +278,9 @@ export default function VideoPlayer({
 
   useEffect(() => {
     saveTimerRef.current = setInterval(() => {
-      if (currentTimeRef.current > 5) {
-        startTransition(() => saveProgress(titleId, currentTimeRef.current))
+      const cur = currentTimeRef.current
+      if (cur > 5) {
+        startTransition(() => saveProgress(titleId, cur, episodeId))
       }
     }, 10_000)
 
@@ -282,10 +288,10 @@ export default function VideoPlayer({
       if (saveTimerRef.current) clearInterval(saveTimerRef.current)
 
       if (currentTimeRef.current > 5) {
-        saveProgress(titleId, currentTimeRef.current)
+        saveProgress(titleId, currentTimeRef.current, episodeId).catch(console.error)
       }
     }
-  }, [titleId, startTransition])
+  }, [titleId, episodeId, startTransition])
 
   const showControls = useCallback(() => {
     setControlsVisible(true)

@@ -6,7 +6,11 @@ const COMPLETION_PERCENT = 0.95
 const COMPLETION_FINAL_SECONDS = 60
 const MIN_CONTINUE_SECONDS = 30
 
-export async function saveProgress(titleId: string, progressSecs: number) {
+export async function saveProgress(
+  titleId: string,
+  progressSecs: number,
+  episodeId?: string
+) {
   const supabase = await createSupabaseServerClient()
 
   const {
@@ -29,25 +33,28 @@ export async function saveProgress(titleId: string, progressSecs: number) {
     return
   }
 
-  const durationSecs = title?.duration_mins
-    ? title.duration_mins * 60
-    : null
+  const durationSecs = title?.duration_mins ? title.duration_mins * 60 : null
 
   const isCompleted =
     durationSecs !== null &&
     safeProgressSecs > MIN_CONTINUE_SECONDS &&
-    (
-      safeProgressSecs >= durationSecs * COMPLETION_PERCENT ||
-      safeProgressSecs >= durationSecs - COMPLETION_FINAL_SECONDS
-    )
+    (safeProgressSecs >= durationSecs * COMPLETION_PERCENT ||
+      safeProgressSecs >= durationSecs - COMPLETION_FINAL_SECONDS)
 
-  const { data: existing, error: existingError } = await supabase
+  // Build query with episode filter
+  let query = supabase
     .from('watch_progress')
     .select('id, completed_at, watched_count, is_rewatching')
     .eq('user_id', user.id)
     .eq('title_id', titleId)
-    .is('episode_id', null)
-    .maybeSingle()
+
+  if (episodeId) {
+    query = query.eq('episode_id', episodeId)
+  } else {
+    query = query.is('episode_id', null)
+  }
+
+  const { data: existing, error: existingError } = await query.maybeSingle()
 
   if (existingError) {
     console.error('Failed to fetch existing progress:', existingError)
@@ -55,18 +62,16 @@ export async function saveProgress(titleId: string, progressSecs: number) {
   }
 
   if (!existing) {
-    const { error } = await supabase
-      .from('watch_progress')
-      .insert({
-        user_id: user.id,
-        title_id: titleId,
-        episode_id: null,
-        progress_secs: safeProgressSecs,
-        completed_at: isCompleted ? now : null,
-        watched_count: isCompleted ? 1 : 0,
-        is_rewatching: false,
-        updated_at: now,
-      })
+    const { error } = await supabase.from('watch_progress').insert({
+      user_id: user.id,
+      title_id: titleId,
+      episode_id: episodeId ?? null,
+      progress_secs: safeProgressSecs,
+      completed_at: isCompleted ? now : null,
+      watched_count: isCompleted ? 1 : 0,
+      is_rewatching: false,
+      updated_at: now,
+    })
 
     if (error) {
       console.error('Failed to insert watch progress:', error)

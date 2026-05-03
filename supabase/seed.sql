@@ -56,6 +56,13 @@ create table if not exists public.episodes (
   created_at     timestamptz default now()
 );
 
+alter table public.seasons enable row level security;
+alter table public.episodes enable row level security;
+
+create policy "Seasons are viewable by everyone" on public.seasons for select using (true);
+create policy "Episodes are viewable by everyone" on public.episodes for select using (true);
+
+
 create table if not exists public.video_assets (
   id           uuid primary key default uuid_generate_v4(),
   title_id     uuid references public.titles(id) on delete cascade unique,
@@ -79,7 +86,7 @@ create table if not exists public.watch_progress (
   episode_id     uuid references public.episodes(id),
   progress_secs  int default 0,
   updated_at     timestamptz default now(),
-  unique(user_id, title_id)
+  unique(user_id, title_id, episode_id)
 );
 
 create table if not exists public.party_rooms (
@@ -190,3 +197,89 @@ on storage.objects for insert with check (bucket_id = 'avatars' and auth.role() 
 
 create policy "Users can update avatars." 
 on storage.objects for update with check (bucket_id = 'avatars' and auth.role() = 'authenticated');
+
+-- ── Seasons & Episodes (Series) ───────────────────────────────
+-- Deep Vein — Season 1
+insert into public.seasons (id, title_id, number)
+select gen_random_uuid(), t.id, 1
+from public.titles t where t.title = 'Deep Vein'
+on conflict do nothing;
+
+insert into public.episodes (season_id, title_id, number, title, description, duration_mins)
+select
+  s.id,
+  t.id,
+  ep.num,
+  ep.title,
+  ep.descr,
+  ep.dur
+from public.seasons s
+join public.titles t on t.id = s.title_id
+cross join (values
+  (1, 'The Body in the Reservoir',   'A forensic diver is called to the scene of a routine drowning — but the body has been there far longer than anyone expected.', 52),
+  (2, 'Cold Current',                'Evidence from the lake floor points to a network of crimes stretching back to the 1970s. The diver goes off-book.', 49),
+  (3, 'Depth Charge',                'A second victim surfaces, and the diver realises she is now a target herself.', 54),
+  (4, 'Silt',                        'Archives reveal a cover-up involving local officials. The investigation nearly costs the diver her career.', 51),
+  (5, 'The Weight of Water',         'The truth behind the original drowning is uncovered — and it implicates someone the diver trusted.', 57),
+  (6, 'Surface Tension',             'A tense finale as the diver confronts the conspirators on the water where it all began.', 61)
+) as ep(num, title, descr, dur)
+where t.title = 'Deep Vein'
+on conflict do nothing;
+
+-- Very Bad Optics — Season 1
+insert into public.seasons (id, title_id, number)
+select gen_random_uuid(), t.id, 1
+from public.titles t where t.title = 'Very Bad Optics'
+on conflict do nothing;
+
+insert into public.episodes (season_id, title_id, number, title, description, duration_mins)
+select s.id, t.id, ep.num, ep.title, ep.descr, ep.dur
+from public.seasons s
+join public.titles t on t.id = s.title_id
+cross join (values
+  (1, 'The Tweet',           'A single misread post sends the firm into full crisis mode — for themselves.', 28),
+  (2, 'Spinning Plates',     'The partners attempt five different strategies in one day. None of them work.', 31),
+  (3, 'No Comment',          'A journalist shows up at the office and refuses to leave. The intern accidentally goes viral.', 29),
+  (4, 'Damage Control',      'The team hires an outside consultant who is somehow worse at PR than they are.', 30),
+  (5, 'The Apology Tour',    'A national apology tour is arranged. Logistics immediately spiral out of control.', 32),
+  (6, 'Good Press',          'Against all odds, the firm stumbles into genuinely positive coverage — then ruins it.', 33)
+) as ep(num, title, descr, dur)
+where t.title = 'Very Bad Optics'
+on conflict do nothing;
+
+-- Pale House — Season 1
+insert into public.seasons (id, title_id, number)
+select gen_random_uuid(), t.id, 1
+from public.titles t where t.title = 'Pale House'
+on conflict do nothing;
+
+insert into public.episodes (season_id, title_id, number, title, description, duration_mins)
+select s.id, t.id, ep.num, ep.title, ep.descr, ep.dur
+from public.seasons s
+join public.titles t on t.id = s.title_id
+cross join (values
+  (1, 'Moving In',           'The Calloway family arrive at their Victorian estate. The first night does not go as planned.', 47),
+  (2, 'Settlement',          'Strange sounds in the walls. The youngest child begins talking to someone the parents cannot see.', 44),
+  (3, 'The East Wing',       'A locked room is finally opened. What is inside changes the family''s understanding of the house.', 51),
+  (4, 'Rot',                 'The restoration contractor refuses to return. The family begins to understand why.', 49),
+  (5, 'Threshold',           'The parents disagree about whether to leave. The house appears to be listening.', 52),
+  (6, 'What Remains',        'A confrontation with the estate''s history reveals who — or what — has been waiting for them.', 58)
+) as ep(num, title, descr, dur)
+where t.title = 'Pale House'
+on conflict do nothing;
+
+-- ── RLS Policies (Just in case they weren't enabled) ─────────
+alter table public.seasons enable row level security;
+alter table public.episodes enable row level security;
+
+do $$ 
+begin
+  if not exists (select 1 from pg_policies where tablename = 'seasons' and policyname = 'Seasons are viewable by everyone') then
+    create policy "Seasons are viewable by everyone" on public.seasons for select using (true);
+  end if;
+  if not exists (select 1 from pg_policies where tablename = 'episodes' and policyname = 'Episodes are viewable by everyone') then
+    create policy "Episodes are viewable by everyone" on public.episodes for select using (true);
+  end if;
+end $$;
+
+

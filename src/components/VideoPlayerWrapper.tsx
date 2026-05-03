@@ -13,6 +13,7 @@ const VideoPlayer = dynamic(() => import('./VideoPlayer'), {
 
 interface Props {
   titleId:              string
+  episodeId?:           string
   titleName:            string
   initialProgressSecs?: number
 }

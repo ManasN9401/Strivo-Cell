@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import LikeDislikeBar from '@/components/creators/LikeDislikeBar'
 import CommentsSection from '@/components/creators/CommentsSection'
@@ -19,6 +19,8 @@ import {
   getTitle,
   getRelatedTitles,
   getProgress,
+  getSeriesProgress,
+  getFirstEpisode,
 } from '@/lib/supabase/queries'
 import type { Title } from '@/types'
 
@@ -35,12 +37,29 @@ function formatCount(n: number): string {
 export default async function WatchPage({ params }: Props) {
   const { videoId } = await params
 
+  const title = await getTitle(videoId)
+  if (!title) notFound()
+
+  // If it's a series, redirect to the correct episode
+  if (title.type === 'series') {
+    const [seriesProgress, firstEpisode] = await Promise.all([
+      getSeriesProgress(videoId),
+      getFirstEpisode(videoId)
+    ])
+
+    if (seriesProgress?.episode_id) {
+      redirect(`/watch/episode/${seriesProgress.episode_id}`)
+    } else if (firstEpisode) {
+      redirect(`/watch/episode/${firstEpisode.id}`)
+    }
+    // If no episodes, just continue as a movie (fallback)
+  }
+
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [video, title, progress] = await Promise.all([
+  const [video, progress] = await Promise.all([
     getVideoById(videoId),
-    getTitle(videoId),
     getProgress(videoId),
   ])
 

@@ -89,6 +89,85 @@ export async function getRelatedTitles(titleId: string, genre: string, limit = 8
   return (data ?? []) as Title[]
 }
 
+// ─── Seasons & Episodes ────────────────────────────────────────────────────────
+
+export async function getSeasons(titleId: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('seasons')
+    .select('*')
+    .eq('title_id', titleId)
+    .order('number', { ascending: true })
+  return data ?? []
+}
+
+export async function getEpisodes(seasonId: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('episodes')
+    .select('*')
+    .eq('season_id', seasonId)
+    .order('number', { ascending: true })
+  return data ?? []
+}
+
+export async function getEpisode(episodeId: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('episodes')
+    .select('*, seasons(*, titles(*))')
+    .eq('id', episodeId)
+    .single()
+  return data
+}
+
+export async function getFirstEpisode(titleId: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('episodes')
+    .select('*, seasons(*)')
+    .eq('title_id', titleId)
+    .order('number', { foreignTable: 'seasons', ascending: true })
+    .order('number', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+  return data
+}
+
+export async function getSeriesProgress(titleId: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('watch_progress')
+    .select('progress_secs, episode_id, episodes(*, seasons(*))')
+    .eq('user_id', user.id)
+    .eq('title_id', titleId)
+    .not('episode_id', 'is', null)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Failed to get series progress:', error)
+    return null
+  }
+
+  return data
+}
+
+export async function getAllEpisodes(titleId: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('episodes')
+    .select('*, seasons(*)')
+    .eq('title_id', titleId)
+    .order('number', { foreignTable: 'seasons', ascending: true })
+    .order('number', { ascending: true })
+  return data ?? []
+}
+
 // ─── Watchlist ────────────────────────────────────────────────────────────────
 
 export async function getWatchlist(): Promise<WatchlistEntry[]> {
@@ -160,26 +239,47 @@ export async function getContinueWatching() {
 
   if (!user) return []
 
+  // Fetch all in-progress rows (movies + episodes), sorted newest first.
+  // We'll deduplicate by title_id client-side so a series only shows once.
   const { data, error } = await supabase
     .from('watch_progress')
-    .select('progress_secs, updated_at, completed_at, is_rewatching, titles(*)')
+    .select('title_id, episode_id, progress_secs, updated_at, completed_at, is_rewatching, titles(*), episodes(*, seasons(*))')
     .eq('user_id', user.id)
-    .is('episode_id', null)
     .gt('progress_secs', 30)
     .or('completed_at.is.null,is_rewatching.eq.true')
     .order('updated_at', { ascending: false })
-    .limit(10)
+    .limit(50) // fetch more so we can dedupe down to 10
 
   if (error) {
     console.error('Failed to get continue watching:', error)
     return []
   }
 
-  return (data ?? []).map((row: any) => ({
-    title: row.titles as Title,
-    progress_secs: row.progress_secs as number,
-    duration_mins: (row.titles?.duration_mins ?? null) as number | null,
-  }))
+  // Keep only the most-recent row per title (the query is already sorted newest→oldest)
+  const seen = new Set<string>()
+  const deduped = (data ?? []).filter((row: any) => {
+    if (seen.has(row.title_id)) return false
+    seen.add(row.title_id)
+    return true
+  }).slice(0, 10)
+
+  return deduped.map((row: any) => {
+    const isEpisode = !!row.episode_id
+    const title = row.titles as Title
+    const ep = row.episodes
+
+    return {
+      title,
+      progress_secs: row.progress_secs as number,
+      duration_mins: (isEpisode ? ep?.duration_mins : title?.duration_mins) as number | null,
+      episode: isEpisode ? {
+        id: ep.id,
+        number: ep.number,
+        title: ep.title,
+        season_number: ep.seasons?.number
+      } : null
+    }
+  })
 }
 
 export async function getWatchedTitleIds() {

@@ -4,7 +4,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import ContentRow from '@/components/ContentRow'
 import Footer from '@/components/Footer'
-import { getTitle, getRelatedTitles, getWatchlistIds } from '@/lib/supabase/queries'
+import EpisodeSelector from '@/components/EpisodeSelector'
+import { 
+  getTitle, 
+  getRelatedTitles, 
+  getWatchlistIds, 
+  getSeasons, 
+  getEpisodes,
+  getSeriesProgress,
+  getFirstEpisode
+} from '@/lib/supabase/queries'
 import { toggleWatchlist } from '@/lib/actions/watchlist'
 import { createPartyRoom } from '@/lib/actions/party'
 
@@ -42,6 +51,37 @@ export default async function TitleDetailPage({ params }: Props) {
   const duration = title.duration_mins
     ? `${Math.floor(title.duration_mins / 60)}h ${title.duration_mins % 60}m`
     : null
+
+  let seasonsWithEpisodes = []
+  if (title.type === 'series') {
+    const seasonsData = await getSeasons(id)
+    seasonsWithEpisodes = await Promise.all(
+      seasonsData.map(async (season) => {
+        const episodes = await getEpisodes(season.id)
+        return { ...season, episodes }
+      })
+    )
+  }
+
+  let playLink = `/watch/${title.id}`
+  let playText = 'Play'
+
+  if (title.type === 'series') {
+    const [seriesProgress, firstEpisode] = await Promise.all([
+      getSeriesProgress(id),
+      getFirstEpisode(id)
+    ])
+
+    if (seriesProgress?.episodes) {
+      const ep = seriesProgress.episodes as any
+      playLink = `/watch/episode/${ep.id}`
+      playText = `Continue Watching S${ep.seasons?.number}E${ep.number}`
+    } else if (firstEpisode) {
+      const ep = firstEpisode as any
+      playLink = `/watch/episode/${ep.id}`
+      playText = `Play S${ep.seasons?.number}E${ep.number}`
+    }
+  }
 
   return (
     <>
@@ -127,7 +167,7 @@ export default async function TitleDetailPage({ params }: Props) {
 
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href={`/watch/${title.id}`}
+                  href={playLink}
                   className="flex items-center gap-2.5 bg-white text-black font-bold
                              px-8 py-3.5 rounded-lg text-sm hover:bg-white/90
                              transition-colors focus-visible:outline-none
@@ -136,7 +176,7 @@ export default async function TitleDetailPage({ params }: Props) {
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
                     <path d="M4 2.5l10 5.5-10 5.5V2.5z" />
                   </svg>
-                  Play
+                  {playText}
                 </Link>
 
                 <form
@@ -174,6 +214,10 @@ export default async function TitleDetailPage({ params }: Props) {
               </div>
             </div>
           </div>
+
+          {title.type === 'series' && seasonsWithEpisodes.length > 0 && (
+            <EpisodeSelector seasons={seasonsWithEpisodes} />
+          )}
 
           {related.length > 0 && (
             <div className="mt-16">

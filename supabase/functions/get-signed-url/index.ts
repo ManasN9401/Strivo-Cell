@@ -69,7 +69,7 @@ function isAbsoluteUrl(path: string) {
   return /^https?:\/\//i.test(path)
 }
 
-function makeFunctionPlaylistUrl(titleId: string, quality: string, playlistPath: string) {
+function makeFunctionPlaylistUrl(titleId: string, episodeId: string | null | undefined, quality: string, playlistPath: string) {
   const supabaseUrl = Deno.env.get('NEXT_PUBLIC_SUPABASE_URL')?.replace(/\/+$/, '')
 
   if (!supabaseUrl) {
@@ -79,6 +79,9 @@ function makeFunctionPlaylistUrl(titleId: string, quality: string, playlistPath:
   const url = new URL(`${supabaseUrl}/functions/v1/get-signed-url/`)
 
   url.searchParams.set('title_id', titleId)
+  if (episodeId) {
+    url.searchParams.set('episode_id', episodeId)
+  }
   url.searchParams.set('quality', quality)
   url.searchParams.set('path', playlistPath)
 
@@ -128,12 +131,14 @@ async function getSignedUrlMap(admin: AdminClient, paths: string[]) {
 async function rewritePlaylist({
   admin,
   titleId,
+  episodeId,
   quality,
   playlistPath,
   playlistText,
 }: {
   admin: AdminClient
   titleId: string
+  episodeId?: string | null
   quality: string
   playlistPath: string
   playlistText: string
@@ -179,7 +184,7 @@ async function rewritePlaylist({
       const objectPath = joinPath(baseDir, relativeUri)
 
       if (isPlaylistPath(objectPath)) {
-        return makeFunctionPlaylistUrl(titleId, quality, objectPath)
+        return makeFunctionPlaylistUrl(titleId, episodeId, quality, objectPath)
       }
 
       const signedUrl = signedUrlByPath.get(objectPath)
@@ -198,7 +203,7 @@ async function rewritePlaylist({
         const objectPath = joinPath(baseDir, uri)
 
         if (isPlaylistPath(objectPath)) {
-          return `URI="${makeFunctionPlaylistUrl(titleId, quality, objectPath)}"`
+          return `URI="${makeFunctionPlaylistUrl(titleId, episodeId, quality, objectPath)}"`
         }
 
         const signedUrl = signedUrlByPath.get(objectPath)
@@ -278,8 +283,25 @@ async function getAuthedClients(
 async function getAsset(
   admin: AdminClient,
   titleId: string,
-  quality: string
+  quality: string,
+  episodeId?: string | null
 ): Promise<VideoAsset | null> {
+  if (episodeId) {
+    const { data: episode, error } = await admin
+      .from('episodes')
+      .select('storage_path')
+      .eq('id', episodeId)
+      .maybeSingle()
+      
+    if (error) {
+      throw new Error(`Episode query failed: ${error.message}`)
+    }
+    
+    if (episode && episode.storage_path) {
+      return { storage_path: episode.storage_path, quality }
+    }
+  }
+
   const { data: asset, error } = await admin
     .from('video_assets')
     .select('storage_path, quality')
@@ -314,13 +336,14 @@ async function handlePlaylistRequest(
   req: Request,
   titleId: string,
   quality: string,
-  requestedPath?: string
+  requestedPath?: string,
+  episodeId?: string | null
 ) {
   const { admin, errorResponse } = await getAuthedClients(req)
 
   if (errorResponse) return errorResponse
 
-  const asset = await getAsset(admin, titleId, quality)
+  const asset = await getAsset(admin, titleId, quality, episodeId)
 
   if (!asset?.storage_path) {
     return json({ error: 'Asset not found' }, 404)
@@ -351,6 +374,7 @@ async function handlePlaylistRequest(
   const rewritten = await rewritePlaylist({
     admin,
     titleId,
+    episodeId,
     quality,
     playlistPath,
     playlistText,
@@ -373,6 +397,7 @@ Deno.serve(async (req: Request) => {
       const url = new URL(req.url)
 
       const titleId = url.searchParams.get('title_id')
+      const episodeId = url.searchParams.get('episode_id')
       const quality = url.searchParams.get('quality') ?? '720p'
       const path = url.searchParams.get('path') ?? undefined
 
@@ -380,7 +405,7 @@ Deno.serve(async (req: Request) => {
         return json({ error: 'title_id required' }, 400)
       }
 
-      const result = await handlePlaylistRequest(req, titleId, quality, path)
+      const result = await handlePlaylistRequest(req, titleId, quality, path, episodeId)
 
       if (result instanceof Response) return result
 
@@ -388,13 +413,13 @@ Deno.serve(async (req: Request) => {
     }
 
     if (req.method === 'POST') {
-      const { title_id, quality = '720p' } = await req.json()
+      const { title_id, episode_id, quality = '720p' } = await req.json()
 
       if (!title_id || typeof title_id !== 'string') {
         return json({ error: 'title_id required' }, 400)
       }
 
-      const result = await handlePlaylistRequest(req, title_id, quality)
+      const result = await handlePlaylistRequest(req, title_id, quality, undefined, episode_id)
 
       if (result instanceof Response) return result
 
